@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.9.12)  14 JAN 2026 03:20
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.9.12)  14 JAN 2026 04:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1685,14 +1685,14 @@ m/n/10 ：| [][]$[][][][][] [] [] [] [][][][][][] [] [][][] [] [][][][][][][][][
 
 
 [52]
-Underfull \hbox (badness 10000) in paragraph at lines 2821--2822
+Underfull \hbox (badness 10000) in paragraph at lines 2823--2824
 []\TU/TimesNewRoman(0)/b/n/10 GitHub Issues\TU/STKaiti(0)/m/n/10 ：| [][]$[][][]
 [][] [] [] [] [][][][][][] [] [][][] [] [][][][][][][][][][][][][][][][][][][][
 ][][][][] [] [][][][][][][][][][] [] [][][][][][][][] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2822--2823
+Underfull \hbox (badness 10000) in paragraph at lines 2824--2825
 []\TU/STKaiti(0)/b/n/10 討 論 區\TU/STKaiti(0)/m/n/10 ：| [][]$[][][][][] [] [] [] 
 [][][][][][] [] [][][] [] [][][][][][][][][][][][][][][][][][][][][][][][] [] [
 ][][][][][][][][][] [] [][][][][][][][] [] [][][][][][] []
@@ -1717,4 +1717,4 @@ Here is how much of TeX's memory you used:
  1348 hyphenation exceptions out of 8191
  84i,12n,97p,446b,1910s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on report_zh.pdf (54 pages).
+Output written on report_zh.xdv (54 pages, 1099344 bytes).
