@@ -4,6 +4,9 @@ LaTeX source files for the senior capstone project report.
 
 專題報告的 LaTeX 原始檔案。
 
+[![Website](https://img.shields.io/badge/Website-VolleyVision%20AI-0033A0)](https://dl-volleyball-analysis.github.io/volleyvision-website/)
+[![Canva](https://img.shields.io/badge/Canva-Presentation-00C4CC)](https://www.canva.com/design/DAG7EZ2BhWw/txwh6VE12fYEakm5bF2sdg/view)
+
 ---
 
 ## Title | 標題
@@ -54,6 +57,17 @@ xelatex report_zh.tex  # Run twice for TOC
 - TeX Live 2023+ or MacTeX
 - XeLaTeX (for Chinese fonts)
 - Required packages: ctex, tikz, listings, graphicx
+
+---
+
+## Related Projects | 相關專案
+
+| Project | Description |
+|---------|-------------|
+| [volleyvision-website](https://github.com/DL-Volleyball-Analysis/volleyvision-website) | Landing page website |
+| [volleyball_analysis_webapp](https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp) | Main web application |
+| [volleyball-court-detection](https://github.com/DL-Volleyball-Analysis/volleyball-court-detection) | Court detection and ball landing |
+| [action-recognition-yolov11](https://github.com/DL-Volleyball-Analysis/action-recognition-yolov11) | Action recognition training |
 
 ---
 
