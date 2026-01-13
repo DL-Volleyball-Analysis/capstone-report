@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.9.12)  14 JAN 2026 00:43
+This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2025.9.12)  14 JAN 2026 03:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1676,31 +1676,42 @@ framework for building APIs,”
 
 
 [51]
+Underfull \hbox (badness 5908) in paragraph at lines 2756--2757
+[]\TU/TimesNewRoman(0)/b/n/10 GitHub \TU/STKaiti(0)/b/n/10 儲 存 庫\TU/STKaiti(0)/
+m/n/10 ：| [][]$[][][][][] [] [] [] [][][][][][] [] [][][] [] [][][][][][][][][]
+[][][][][][][][][][][][][][][] [] [][][][][][][][][][] [] [][][][][][][][] []
+ []
+
+
 
 [52]
+Underfull \hbox (badness 10000) in paragraph at lines 2821--2822
+[]\TU/TimesNewRoman(0)/b/n/10 GitHub Issues\TU/STKaiti(0)/m/n/10 ：| [][]$[][][]
+[][] [] [] [] [][][][][][] [] [][][] [] [][][][][][][][][][][][][][][][][][][][
+][][][][] [] [][][][][][][][][][] [] [][][][][][][][] []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2822--2823
+[]\TU/STKaiti(0)/b/n/10 討 論 區\TU/STKaiti(0)/m/n/10 ：| [][]$[][][][][] [] [] [] 
+[][][][][][] [] [][][] [] [][][][][][][][][][][][][][][][][][][][][][][][] [] [
+][][][][][][][][][] [] [][][][][][][][] [] [][][][][][] []
+ []
+
+
 
 [53] (./report_zh.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2022/08/05>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `report_zh.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `report_zh.out':
-(rerunfilecheck)             Before: 4795F0569F6D3D2C19E0F0213BEF2905;19205
-(rerunfilecheck)             After:  8BCE8125EB5E673878B5A90C87826CBA;19138.
+Package rerunfilecheck Info: File `report_zh.out' has not changed.
+(rerunfilecheck)             Checksum: 8BCE8125EB5E673878B5A90C87826CBA;19138.
  ) 
 Here is how much of TeX's memory you used:
  34684 strings out of 473832
  730734 string characters out of 5729481
- 1662162 words of memory out of 5000000
+ 1662335 words of memory out of 5000000
  57136 multiletter control sequences out of 15000+600000
  562464 words of font info for 89 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
