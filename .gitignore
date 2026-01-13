@@ -1,0 +1,18 @@
+# LaTeX temporary files
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.out
+*.bbl
+*.blg
+
+# macOS
+.DS_Store
+
+# Keep PDFs (final output)
+# *.pdf
