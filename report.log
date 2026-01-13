@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.12)  29 SEP 2025 12:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.9.12)  14 JAN 2026 03:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -516,14 +516,34 @@ Package pdftex.def Info: image/yolov11/set_yv11.png  used on input line 255.
 LaTeX Warning: Float too large for page by 18.53969pt on input line 259.
 
 
-Overfull \hbox (5.6778pt too wide) in paragraph at lines 283--295
-[][] 
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
+[]\OT1/ptm/b/n/10 Organization: $\OT1/ptm/m/n/10 https : / / github . com /
  []
 
 
-Underfull \vbox (badness 6775) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 282--283
+[]\OT1/ptm/b/n/10 Web Ap-pli-ca-tion: $\OT1/ptm/m/n/10 https : / / github . com
+ /
+ []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 283--284
+[]\OT1/ptm/b/n/10 Action Recog-ni-tion: $\OT1/ptm/m/n/10 https : / / github . c
+om /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 284--285
+[]\OT1/ptm/b/n/10 Technical Re-port: $\OT1/ptm/m/n/10 https : / / github . com 
+/
+ []
+
+
+
+
+Overfull \hbox (5.6778pt too wide) in paragraph at lines 292--304
+[][] 
+ []
 
 
 
@@ -549,7 +569,7 @@ usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/
 texlive/2025/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2
 025/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on report.pdf (5 pages, 26770459 bytes).
+Output written on report.pdf (5 pages, 26771156 bytes).
 PDF statistics:
  59 PDF objects out of 1000 (max. 8388607)
  32 compressed objects within 1 object stream
