@@ -1,0 +1,20 @@
+# Fdb version 4
+["pdflatex"] 1762409923.21178 "/Users/jesse/Documents/專題/Report/report_zh.tex" "report_zh.pdf" "report_zh" 1762409923.39602 2
+  "/Users/jesse/Documents/專題/Report/report_zh.tex" 1762409922.78398 83128 b96c7361e681b022d715329d0d5f9002 ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls" 1738182759 20144 63d8bacaf52e5abf4db3bc322373e1d4 ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/base/size10.clo" 1738182759 8448 5cf247d4bd0c7d5d711bbbdf111fae2e ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/fontspec/fontspec.sty" 1715459803 3755 4872b99d810c024f9c09bb1c62ffee3b ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def" 1716410060 29785 9f93ab201fe5dd053afcc6c1bcf7d266 ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/l3kernel/expl3.sty" 1738271527 6565 f51d809db6193fae7b06c1bc26ca8f75 ""
+  "/usr/local/texlive/2025/texmf-dist/tex/latex/l3packages/xparse/xparse.sty" 1724879202 9783 ab4bee47700c04aadedb8da27591b0ab ""
+  "/usr/local/texlive/2025/texmf-dist/tex/xelatex/xecjk/xeCJK.sty" 1659735237 183137 ed372550124703b2b73cbcc0b47cb20f ""
+  "/usr/local/texlive/2025/texmf-dist/web2c/texmf.cnf" 1739380943 42148 61becc7c670cd061bb319c643c27fdd4 ""
+  "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1757677231 3345739 39d03c0f240d2668fd96e91d10629e4d ""
+  "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
+  "report_zh.aux" 1762409923.21122 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "report_zh.tex" 1762409922.78398 83128 b96c7361e681b022d715329d0d5f9002 ""
+  (generated)
+  "report_zh.aux"
+  "report_zh.log"
+  "report_zh.pdf"
+  (rewritten before read)

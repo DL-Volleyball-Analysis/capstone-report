@@ -1,0 +1,115 @@
+\contentsline {section}{專題分工及貢獻度說明}{1}{Doc-Start}%
+\contentsline {section}{\numberline {1}摘要 (ABSTRACT)}{7}{section.1}%
+\contentsline {subsection}{\numberline {1.1}想法與功能 (Ideas and Features)}{7}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}演算法與方法 (Algorithms and Methods)}{7}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}簡單結論 (Summary of Conclusions)}{7}{subsection.1.3}%
+\contentsline {section}{\numberline {2}簡介 (INTRODUCTION)}{8}{section.2}%
+\contentsline {subsection}{\numberline {2.1}相關研究 (Related Work)}{8}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}動機 (Motivation)}{8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}目標 (Objectives)}{8}{subsection.2.3}%
+\contentsline {section}{\numberline {3}理論推導 (Theoretical Derivations)}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}問題定義 (Problem Definition)}{9}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}系統整體架構 (System Architecture)}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}核心演算法流程 (Core Algorithm Workflow)}{10}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}排球追蹤演算法流程}{10}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}動作識別與合併演算法}{10}{subsubsection.3.3.2}%
+\contentsline {section}{\numberline {4}深度學習模型架構 (Deep Learning Model Architectures)}{11}{section.4}%
+\contentsline {subsection}{\numberline {4.1}U-Net 架構與 VballNet 模型}{11}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}U-Net 架構原理}{11}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}VballNet 模型設計}{11}{subsubsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.3}YOLO 基本概念}{13}{subsubsection.4.1.3}%
+\contentsline {subsubsection}{\numberline {4.1.4}YOLO 的演進歷程}{14}{subsubsection.4.1.4}%
+\contentsline {subsubsection}{\numberline {4.1.5}YOLOv11 架構詳解}{14}{subsubsection.4.1.5}%
+\contentsline {subsubsection}{\numberline {4.1.6}YOLOv11m 動作識別模型}{15}{subsubsection.4.1.6}%
+\contentsline {subsubsection}{\numberline {4.1.7}動作識別結果展示}{15}{subsubsection.4.1.7}%
+\contentsline {subsubsection}{\numberline {4.1.8}YOLOv8 架構詳解}{16}{subsubsection.4.1.8}%
+\contentsline {subsection}{\numberline {4.2}Norfair 多物件追蹤}{18}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}追蹤原理}{18}{subsubsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.3}模型整合與優化}{19}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}ONNX Runtime 優化}{19}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Ultralytics YOLO 框架}{19}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3}模型載入與初始化}{20}{subsubsection.4.3.3}%
+\contentsline {subsubsection}{\numberline {4.3.4}推理優化策略}{20}{subsubsection.4.3.4}%
+\contentsline {section}{\numberline {5}模組設計描述 (Module Description)}{21}{section.5}%
+\contentsline {subsection}{\numberline {5.1}系統模組概覽}{21}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}排球追蹤模組}{21}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}模組原型}{21}{subsubsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2}關鍵參數說明}{21}{subsubsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.3}動作識別模組}{21}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}模組原型}{21}{subsubsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.2}動作類別定義}{22}{subsubsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.4}球員追蹤模組}{22}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.1}模組原型}{22}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}追蹤參數配置}{22}{subsubsection.5.4.2}%
+\contentsline {section}{\numberline {6}軟體工程實踐 (Software Engineering Practices)}{23}{section.6}%
+\contentsline {subsection}{\numberline {6.1}系統架構設計}{23}{subsection.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.1}前後端分離架構}{23}{subsubsection.6.1.1}%
+\contentsline {subsubsection}{\numberline {6.1.2}專案目錄結構}{23}{subsubsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.2}後端架構 (Backend Architecture)}{24}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}FastAPI 框架選擇}{24}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}API 端點設計}{25}{subsubsection.6.2.2}%
+\contentsline {subsubsection}{\numberline {6.2.3}非阻塞影片分析}{25}{subsubsection.6.2.3}%
+\contentsline {subsubsection}{\numberline {6.2.4}WebSocket 即時通訊}{26}{subsubsection.6.2.4}%
+\contentsline {subsection}{\numberline {6.3}前端架構 (Frontend Architecture)}{26}{subsection.6.3}%
+\contentsline {subsubsection}{\numberline {6.3.1}技術棧選擇}{26}{subsubsection.6.3.1}%
+\contentsline {subsubsection}{\numberline {6.3.2}元件架構}{27}{subsubsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.3}API 服務層設計}{27}{subsubsection.6.3.3}%
+\contentsline {subsection}{\numberline {6.4}容器化部署 (Docker Containerization)}{28}{subsection.6.4}%
+\contentsline {subsubsection}{\numberline {6.4.1}Docker Compose 編排}{28}{subsubsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.2}後端 Dockerfile}{29}{subsubsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.3}容器化優勢}{29}{subsubsection.6.4.3}%
+\contentsline {subsection}{\numberline {6.5}自動化測試 (Automated Testing)}{30}{subsection.6.5}%
+\contentsline {subsubsection}{\numberline {6.5.1}測試架構}{30}{subsubsection.6.5.1}%
+\contentsline {subsubsection}{\numberline {6.5.2}測試夾具設計}{30}{subsubsection.6.5.2}%
+\contentsline {subsubsection}{\numberline {6.5.3}測試執行腳本}{31}{subsubsection.6.5.3}%
+\contentsline {subsubsection}{\numberline {6.5.4}測試範例}{31}{subsubsection.6.5.4}%
+\contentsline {subsection}{\numberline {6.6}開發工作流程}{32}{subsection.6.6}%
+\contentsline {subsubsection}{\numberline {6.6.1}版本控制}{32}{subsubsection.6.6.1}%
+\contentsline {subsubsection}{\numberline {6.6.2}程式碼風格}{32}{subsubsection.6.6.2}%
+\contentsline {subsubsection}{\numberline {6.6.3}文檔管理}{32}{subsubsection.6.6.3}%
+\contentsline {section}{\numberline {7}實驗結果 (Experimental Results)}{33}{section.7}%
+\contentsline {subsection}{\numberline {7.1}實驗環境配置}{33}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}排球追蹤性能評估}{33}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}整體性能指標}{33}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}不同場景下的性能}{33}{subsubsection.7.2.2}%
+\contentsline {subsection}{\numberline {7.3}動作識別性能評估}{34}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {7.3.1}整體性能}{34}{subsubsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.2}各動作類別性能}{34}{subsubsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.3}混淆矩陣分析}{34}{subsubsection.7.3.3}%
+\contentsline {subsection}{\numberline {7.4}球員追蹤性能評估}{34}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}系統整合性能}{35}{subsection.7.5}%
+\contentsline {subsubsection}{\numberline {7.5.1}端到端處理性能}{35}{subsubsection.7.5.1}%
+\contentsline {subsubsection}{\numberline {7.5.2}記憶體使用分析}{35}{subsubsection.7.5.2}%
+\contentsline {subsection}{\numberline {7.6}性能比較分析}{35}{subsection.7.6}%
+\contentsline {subsubsection}{\numberline {7.6.1}與其他系統的比較}{35}{subsubsection.7.6.1}%
+\contentsline {subsection}{\numberline {7.7}功能展示}{36}{subsection.7.7}%
+\contentsline {subsubsection}{\numberline {7.7.1}用戶介面截圖}{36}{subsubsection.7.7.1}%
+\contentsline {section}{\numberline {8}討論 (Discussions)}{37}{section.8}%
+\contentsline {subsection}{\numberline {8.1}優點與缺點 (Advantages and Disadvantages)}{37}{subsection.8.1}%
+\contentsline {subsubsection}{\numberline {8.1.1}系統優點}{37}{subsubsection.8.1.1}%
+\contentsline {subsubsection}{\numberline {8.1.2}系統限制}{37}{subsubsection.8.1.2}%
+\contentsline {subsection}{\numberline {8.2}改進建議與解決方案}{37}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}與時事議題相關性}{37}{subsection.8.3}%
+\contentsline {subsubsection}{\numberline {8.3.1}體育科技發展}{37}{subsubsection.8.3.1}%
+\contentsline {subsubsection}{\numberline {8.3.2}教育科技創新}{38}{subsubsection.8.3.2}%
+\contentsline {subsection}{\numberline {8.4}對環境與社會的影響}{38}{subsection.8.4}%
+\contentsline {subsubsection}{\numberline {8.4.1}正面影響}{38}{subsubsection.8.4.1}%
+\contentsline {subsubsection}{\numberline {8.4.2}潛在風險}{38}{subsubsection.8.4.2}%
+\contentsline {subsection}{\numberline {8.5}持續學習能力 (Lifelong Learning)}{38}{subsection.8.5}%
+\contentsline {subsection}{\numberline {8.6}專業倫理與社會責任}{38}{subsection.8.6}%
+\contentsline {subsubsection}{\numberline {8.6.1}資料使用倫理}{38}{subsubsection.8.6.1}%
+\contentsline {subsubsection}{\numberline {8.6.2}開源貢獻}{38}{subsubsection.8.6.2}%
+\contentsline {subsubsection}{\numberline {8.6.3}公平使用}{39}{subsubsection.8.6.3}%
+\contentsline {section}{\numberline {9}結論 (Conclusions)}{40}{section.9}%
+\contentsline {subsection}{\numberline {9.1}研究摘要 (Summary of Findings)}{40}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}主要優點 (Major Advantages)}{40}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}未來工作 (Future Work)}{40}{subsection.9.3}%
+\contentsline {subsubsection}{\numberline {9.3.1}短期改進計畫（3-6 個月）}{40}{subsubsection.9.3.1}%
+\contentsline {subsubsection}{\numberline {9.3.2}中期發展目標（6-12 個月）}{41}{subsubsection.9.3.2}%
+\contentsline {subsubsection}{\numberline {9.3.3}長期願景（1-2 年）}{41}{subsubsection.9.3.3}%
+\contentsline {subsection}{\numberline {9.4}技術路線圖}{42}{subsection.9.4}%
+\contentsline {subsection}{\numberline {9.5}最終總結}{42}{subsection.9.5}%
+\contentsline {section}{附錄：原始程式碼}{43}{subsection.9.5}%
+\contentsline {section}{參考文獻}{51}{lstnumber.17.93}%
+\contentsline {section}{專題展示資訊}{52}{lstnumber.17.93}%
+\contentsfinish 

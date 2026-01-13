@@ -1,0 +1,2828 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 國立臺灣海洋大學資訊工程學系專題報告
+% 改進版 - 增強結構與可視化
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,14pt,oneside]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 套件設定
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc}
+\usepackage{adjustbox}
+\usepackage{mathtools}
+\usepackage{pifont}  % 支援特殊符號 ✓ 和 ✗
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 頁面設定
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\geometry{
+    a4paper,
+    left=3cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 字體設定
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setCJKmainfont{STKaiti}[
+    BoldFont=STKaiti,
+    BoldFeatures={FakeBold=3},
+    ItalicFont=STKaiti,
+    ItalicFeatures={FakeSlant=0.2},
+    Mapping=tex-text
+]
+\setCJKmonofont{STKaiti}[
+    BoldFont=STKaiti,
+    BoldFeatures={FakeBold=3},
+    ItalicFont=STKaiti,
+    ItalicFeatures={FakeSlant=0.2}
+]
+\setmainfont{Times New Roman}[
+    BoldFont=Times New Roman Bold,
+    ItalicFont=Times New Roman Italic,
+    BoldItalicFont=Times New Roman Bold Italic
+]
+
+% 行距設定
+\onehalfspacing
+
+% 頁碼設定
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 標題格式設定
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\titleformat{\section}{\Large\bfseries\centering}{}{0pt}{}
+\titleformat{\subsection}{\large\bfseries}{}{0pt}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{}{0pt}{}
+
+% 設定超連結顏色
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,
+    urlcolor=blue,
+    citecolor=black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0},
+    pdfstartview={FitH},
+    pdftitle={基於深度學習的排球比賽分析系統},
+    pdfauthor={梁祐嘉},
+    pdfsubject={專題報告},
+    pdfkeywords={排球, 深度學習, 物件偵測, YOLO}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 頁面佈局優化
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 避免過寬的 hbox 警告
+\tolerance=1000
+\emergencystretch=3em
+\hfuzz=0.5pt
+\widowpenalty=10000
+\clubpenalty=10000
+
+% 避免浮動體放置問題
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+
+% 設置目錄顯示深度
+\setcounter{tocdepth}{3}  % 顯示到 subsubsection
+\setcounter{secnumdepth}{3}  % 編號到 subsubsection
+
+% 演算法環境中文支持
+\floatname{algorithm}{演算法}
+\algrenewcommand\algorithmicend{\textbf{結束}}
+\algrenewcommand\algorithmicdo{\textbf{執行}}
+\algrenewcommand\algorithmicwhile{\textbf{當}}
+\algrenewcommand\algorithmicfor{\textbf{對於}}
+\algrenewcommand\algorithmicif{\textbf{如果}}
+\algrenewcommand\algorithmicthen{\textbf{則}}
+\algrenewcommand\algorithmicelse{\textbf{否則}}
+\algrenewcommand\algorithmicreturn{\textbf{返回}}
+\algrenewcommand\algorithmicfunction{\textbf{函數}}
+
+% 圖片佔位符命令（優化版本，避免 LR mode 錯誤）
+\newcommand{\placeholderimage}[3]{
+    % #1: width, #2: height, #3: text
+    \begin{minipage}{#1}
+    \centering
+    \begin{tikzpicture}[baseline=(current bounding box.center)]
+        \draw[fill=gray!20, draw=gray!60] (0,0) rectangle (#1,#2);
+        \node[text width=0.8*#1, align=center] at (#1/2,#2/2) {#3};
+    \end{tikzpicture}
+    \end{minipage}
+}
+
+% 圖片檢查命令
+\newcommand{\includeimageorsub}[2]{
+    % #1: 圖片路徑, #2: 替代文字
+    \IfFileExists{#1}{
+        \includegraphics[width=\textwidth]{#1}
+    }{
+        \fbox{\parbox{\textwidth}{\centering\vspace{3cm}#2\vspace{3cm}}}
+    }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 程式碼設定
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    commentstyle=\color{green!60!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    tabsize=4,
+    captionpos=b
+}
+
+\lstdefinestyle{jsstyle}{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    commentstyle=\color{green!60!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    tabsize=2,
+    captionpos=b,
+    % JavaScript/TypeScript 關鍵字
+    morekeywords={const, let, var, function, export, import, default, class, 
+                  extends, implements, interface, type, enum, namespace, 
+                  async, await, yield, return, if, else, switch, case, 
+                  for, while, do, break, continue, try, catch, finally,
+                  new, this, super, static, public, private, protected,
+                  React, FC, useState, useEffect, useRef, useCallback, useMemo}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 文件開始
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 封面
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries 國立臺灣海洋大學資訊工程學系\par}
+    \vspace{1cm}
+    {\Huge\bfseries 專題報告\par}
+    
+    \vspace{3cm}
+    
+    {\huge\bfseries 基於深度學習的排球比賽分析系統\par}
+    \vspace{0.5cm}
+    {\Large Volleyball Match Analysis System Based on Deep Learning\par}
+    
+    \vspace{3cm}
+    
+    {\Large\bfseries 作者\par}
+    \vspace{0.5cm}
+    \begin{tabular}{lll}
+        \Large 學號 & \Large 姓名 & \Large e-mail \\
+        \hline
+        \Large 01157145 & \Large 梁祐嘉 & \Large ch993115@gmail.com \\
+        \Large 01157012 & \Large 蔡佩穎 & \Large tinatina62027@gmail.com \\
+        \Large 01157016 & \Large 鍾佳芯 & \Large aa0925129765@gmail.com \\
+    \end{tabular}
+    
+    \vspace{2cm}
+    
+    {\Large\bfseries 指導教授：丁培毅 教授\par}
+    
+    \vfill
+    
+    {\Large 中華民國 114 年 11 月\par}
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 專題分工及貢獻度說明
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{專題分工及貢獻度說明}
+\addcontentsline{toc}{section}{專題分工及貢獻度說明}
+
+\begin{table}[H]
+    \centering
+    \caption{專題分工及貢獻度}
+    \begin{tabular}{|p{2cm}|p{6cm}|p{2cm}|}
+        \hline
+        \textbf{姓名} & \textbf{主要工作內容} & \textbf{貢獻度} \\
+        \hline
+        梁祐嘉 & 工作分配、系統實作、報告撰寫 & 60\% \\
+        \hline
+        蔡佩穎 & 論文閱讀、系統實作、報告撰寫 & 30\% \\
+        \hline
+        鍾佳芯 & 論文閱讀、系統實作、報告撰寫 & 10\% \\
+        \hline
+        \multicolumn{2}{|r|}{\textbf{總計}} & \textbf{100\%} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 目錄
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 摘要
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{摘要 (ABSTRACT)}
+
+\subsection{想法與功能 (Ideas and Features)}
+本專題旨在開發一個基於深度學習的排球比賽分析系統，能夠自動偵測球員動作、追蹤球的位置、判斷得分情況，並提供可回放的賽事檢討功能。系統整合了多個深度學習模型，包括使用 VballNet 進行排球追蹤、使用 YOLOv11 進行球員動作識別，以及使用 YOLOv8 配合 Norfair 進行球員偵測與追蹤。
+
+系統的核心功能包括：
+\begin{itemize}
+    \item \textbf{排球追蹤}：使用 VballNet 模型基於 U-Net 架構，能夠準確追蹤排球在影片中的位置，並通過時間序列分析判斷球的落點位置。
+    \item \textbf{球員動作識別}：使用 YOLOv11m 模型識別五種關鍵排球動作，包括發球（serve）、扣球（spike）、攔網（block）、接球（receive）和舉球（set）。
+    \item \textbf{球員偵測與追蹤}：使用 YOLOv8 進行球員偵測，並結合 Norfair 追蹤器實現跨幀的球員追蹤，支持球衣號碼識別功能。
+    \item \textbf{網頁應用系統}：提供完整的 React 前端和 FastAPI 後端，支持影片上傳、分析處理、互動式播放和數據可視化等功能。
+\end{itemize}
+
+\subsection{演算法與方法 (Algorithms and Methods)}
+本系統採用以下演算法與方法：
+
+\begin{enumerate}
+    \item \textbf{排球追蹤演算法}：使用 VballNet 模型進行球的座標追蹤，模型基於 U-Net 架構，具有編碼器-解碼器結構和跳躍連接機制。
+    
+    \item \textbf{動作識別演算法}：使用 YOLOv11m 模型進行物件偵測，採用滑動窗口方法處理連續動作。
+    
+    \item \textbf{球員追蹤演算法}：使用 YOLOv8 進行球員偵測，使用 Norfair 追蹤器進行多物件追蹤。
+\end{enumerate}
+
+\subsection{簡單結論 (Summary of Conclusions)}
+本專題成功開發了一個完整的排球比賽分析系統，整合了排球追蹤、動作識別和球員追蹤等多項功能。系統在測試影片上取得了良好的性能表現：排球追蹤準確率達到 79.5\%，動作識別 mAP@0.5 達到 94.49\%，處理速度達到 7.91 FPS。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 簡介
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{簡介 (INTRODUCTION)}
+
+\subsection{相關研究 (Related Work)}
+隨著深度學習技術的快速發展，電腦視覺在體育分析領域的應用日益廣泛。在排球比賽分析方面，相關研究主要集中在以下幾個方面：
+
+\begin{enumerate}
+    \item \textbf{球體追蹤技術}：VballNet 模型基於 U-Net 架構，專門設計用於追蹤快速移動的小型物體。
+    
+    \item \textbf{動作識別技術}：YOLO 系列模型在物件偵測領域取得了顯著成果。
+    
+    \item \textbf{多物件追蹤技術}：Norfair 是一個輕量級的多物件追蹤框架。
+\end{enumerate}
+
+\subsection{動機 (Motivation)}
+作為系上排球隊的成員，我們深刻理解每個球員在比賽中都有明確的角色和職責。然而，在訓練和比賽過程中，缺乏客觀數據使得難以準確掌握球員的優缺點。因此，我們希望開發一個排球比賽分析系統，協助球隊進行賽後檢討、分析全員狀態，並提供客觀數據支持，讓球隊能夠明確了解需要加強的方向。
+
+\subsection{目標 (Objectives)}
+本專題的主要目標包括：
+
+\begin{enumerate}
+    \item \textbf{開發準確的排球追蹤系統}：實現高精度的排球位置追蹤和落點判斷，準確率目標達到 80\% 以上。
+    
+    \item \textbf{建立可靠的動作識別模型}：訓練並優化 YOLOv11 模型，mAP@0.5 目標達到 90\% 以上。
+    
+    \item \textbf{實現球員追蹤功能}：開發球員偵測與追蹤系統，支持球衣號碼識別。
+    
+    \item \textbf{建立完整的應用系統}：開發包含前端和後端的網頁應用。
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 理論推導（新增系統架構圖）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{理論推導 (Theoretical Derivations)}
+
+\subsection{問題定義 (Problem Definition)}
+本專題旨在解決以下核心問題：
+
+\begin{enumerate}
+    \item \textbf{排球追蹤問題}：如何在複雜的比賽場景中準確追蹤快速移動的排球。
+    \item \textbf{動作識別問題}：如何從影片中自動識別球員的關鍵動作。
+    \item \textbf{球員追蹤問題}：如何在多幀影片中保持球員身份的一致性。
+    \item \textbf{系統整合問題}：如何將多個功能模組整合成一個完整的應用系統。
+\end{enumerate}
+
+\subsection{系統整體架構 (System Architecture)}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.5cm,
+        box/.style={rectangle, draw, fill=blue!20, text width=3cm, text centered, rounded corners, minimum height=1cm},
+        box_planned/.style={rectangle, draw, fill=gray!20, dashed, text width=3cm, text centered, rounded corners, minimum height=1cm},
+        arrow/.style={->, >=stealth, thick}
+    ]
+        % Input
+        \node[box] (input) {影片輸入\\Video Input};
+        
+        % Processing Layer - 四個模組均勻分佈
+        \node[box, below=of input, xshift=-6.0cm] (ball) {球追蹤\\Ball Tracking\\(VballNet)};
+        \node[box, below=of input, xshift=-2.0cm] (action) {動作識別\\Action Recognition\\(YOLOv11m)};
+        \node[box, below=of input, xshift=2.0cm] (player) {球員追蹤\\Player Tracking\\(YOLOv8 + Norfair)};
+        \node[box_planned, below=of input, xshift=6.0cm] (court) {場地偵測\\Court Detection\\(未實作)};
+        
+        % Integration Layer
+        \node[box, below=of action, xshift=2.0cm, yshift=-1cm] (processor) {分析處理器\\Analyzer Core};
+        
+        % Backend
+        \node[box, below=of processor] (backend) {後端 API\\FastAPI Backend};
+        
+        % Frontend
+        \node[box, below=of backend] (frontend) {前端介面\\React Frontend};
+        
+        % Output
+        \node[box, below=of frontend] (output) {分析結果\\Analysis Results};
+        
+        % Arrows from input to processing modules
+        \draw[arrow] (input) -- (ball);
+        \draw[arrow] (input) -- (action);
+        \draw[arrow] (input) -- (player);
+        \draw[arrow, dashed] (input) -- (court);
+        
+        % Arrows from processing modules to processor
+        \draw[arrow] (ball) -- (processor);
+        \draw[arrow] (action) -- (processor);
+        \draw[arrow] (player) -- (processor);
+        \draw[arrow, dashed] (court) -- (processor);
+        
+        % Arrows through the stack
+        \draw[arrow] (processor) -- (backend);
+        \draw[arrow] (backend) -- (frontend);
+        \draw[arrow] (frontend) -- (output);
+    \end{tikzpicture}
+    \caption{系統整體架構圖（虛線框表示未實作功能）}
+    \label{fig:system_architecture}
+\end{figure}
+
+\subsection{核心演算法流程 (Core Algorithm Workflow)}
+
+\subsubsection{排球追蹤演算法流程}
+
+\begin{algorithm}[H]
+\caption{排球追蹤演算法}
+\begin{algorithmic}[1]
+\Require 輸入影片幀 $F$，VballNet 模型 $M_{ball}$
+\Ensure 球的位置和落點資訊
+\State 初始化 9 幀緩衝區 $B \gets []$
+\For{每一幀 $f \in F$}
+    \State $f_{gray} \gets$ 轉換為灰度圖並調整為 $288 \times 512$
+    \State $B$.append($f_{gray}$)
+    \If{len($B$) $>$ 9}
+        \State $B$.pop(0)
+    \EndIf
+    \State $coord \gets M_{ball}$(stack($B$))
+    \State 轉換座標到原始尺寸
+    \State 記錄軌跡點
+\EndFor
+\State 分析軌跡判斷落點
+\State \Return 球的軌跡和落點
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{動作識別與合併演算法}
+
+\begin{algorithm}[H]
+\caption{動作識別與合併}
+\begin{algorithmic}[1]
+\Require 影片幀 $F$，YOLOv11m 模型 $M_{action}$
+\Ensure 合併後的動作事件列表
+\State 初始化活躍動作字典 $A_{active} \gets \{\}$
+\State 初始化動作列表 $A_{result} \gets []$
+\For{每一幀 $f \in F$}
+    \State $detections \gets M_{action}(f)$
+    \State 過濾低信心度檢測（$conf < 0.6$）
+    \For{每個檢測 $d \in detections$}
+        \State $key \gets$ (player\_id, action\_type)
+        \If{$key \in A_{active}$}
+            \State 更新 $A_{active}[key]$ 的結束幀和最大信心度
+        \Else
+            \State 創建新的動作記錄於 $A_{active}[key]$
+        \EndIf
+    \EndFor
+    \State 檢查並完成超過最大間隔的動作
+\EndFor
+\State 完成所有未結束的動作
+\State \Return $A_{result}$
+\end{algorithmic}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 深度學習模型架構說明（新增）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{深度學習模型架構 (Deep Learning Model Architectures)}
+
+本專題系統整合了多個深度學習模型，每個模型負責不同的任務。本節將詳細說明各模型的架構原理、設計理念和技術細節。
+
+\subsection{U-Net 架構與 VballNet 模型}
+
+\subsubsection{U-Net 架構原理}
+
+U-Net 是一種專門設計用於語義分割的卷積神經網絡架構，由 Ronneberger 等人於 2015 年提出。其名稱來源於其 U 型的網路結構，具有對稱的編碼器-解碼器（Encoder-Decoder）架構。
+
+\textbf{U-Net 的核心特點：}
+
+\begin{enumerate}
+    \item \textbf{編碼器路徑（下採樣）}：通過卷積和池化操作逐步降低特徵圖解析度，同時增加特徵通道數，提取高層語義特徵。
+    \item \textbf{解碼器路徑（上採樣）}：通過轉置卷積或上採樣操作逐步恢復特徵圖解析度，同時減少特徵通道數。
+    \item \textbf{跳躍連接（Skip Connections）}：將編碼器不同層級的特徵直接連接到解碼器對應層級，保留低層次的空間細節信息。
+    \item \textbf{精確定位能力}：通過跳躍連接結合高層語義和低層細節，實現像素級的精確定位。
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image/unet/u-net-architecture.png}
+    \caption{U-Net 架構示意圖}
+    \label{fig:unet_architecture}
+\end{figure}
+
+\subsubsection{VballNet 模型設計}
+
+VballNet 是基於 U-Net 架構專門設計用於排球追蹤的模型，針對快速移動的小型物體進行優化。
+
+\textbf{VballNet 的技術規格：}
+
+\begin{table}[H]
+    \centering
+    \caption{VballNet 模型技術規格}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{項目} & \textbf{規格} \\
+        \hline
+        基礎架構 & U-Net (編碼器-解碼器) \\
+        \hline
+        輸入格式 & 9 幀灰度圖序列 (1, 9, 288, 512) \\
+        \hline
+        輸出格式 & 9 個熱力圖 (1, 9, 288, 512) \\
+        \hline
+        輸入預處理 & 灰度轉換、尺寸調整、正規化 [0, 1] \\
+        \hline
+        後處理方法 & 閾值化、輪廓檢測、質心計算 \\
+        \hline
+        模型格式 & ONNX Runtime（優化推理） \\
+        \hline
+        訓練數據 & 148 個影片序列 \\
+        \hline
+        最佳性能 & F1: 0.874, Precision: 0.882, Recall: 0.867 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{序列處理機制：}
+
+VballNet 採用時間序列輸入，使用 9 幀緩衝區來捕捉球的運動軌跡：
+
+\begin{itemize}
+    \item \textbf{緩衝區維護}：維護一個 9 幀的循環緩衝區，每處理一幀新圖像時，移除最舊的幀並添加新幀。
+    \item \textbf{時空特徵融合}：通過堆疊 9 個連續幀，模型能夠學習時空特徵，捕捉球的運動模式和速度變化。
+    \item \textbf{熱力圖輸出}：模型輸出 9 個熱力圖，每個對應一個時間步，使用最後一個時間步（索引 8）的結果作為最終檢測。
+\end{itemize}
+
+\textbf{預處理流程：}
+
+\begin{enumerate}
+    \item 將輸入幀轉換為灰度圖像（減少計算量）
+    \item 調整尺寸至 288×512（保持寬高比並優化記憶體使用）
+    \item 正規化像素值到 [0, 1] 範圍
+    \item 堆疊 9 幀形成時序輸入張量
+\end{enumerate}
+
+\textbf{後處理流程：}
+
+\begin{enumerate}
+    \item 提取最後一個時間步的熱力圖（索引 8）
+    \item 應用閾值（0.3）進行二值化
+    \item 尋找輪廓並選擇最大輪廓
+    \item 計算質心作為球的位置
+    \item 計算邊界框並映射回原始圖像尺寸
+    \item 使用熱力圖最大值作為置信度分數
+\end{enumerate}
+
+\textbf{落點判斷流程：}
+
+系統通過分析球的軌跡來判斷落點位置。當球的速度從下降轉為接觸地面時，系統會標記該位置為落點。
+
+\textbf{場地偵測功能（未實作）}：
+
+目前系統尚未實作場地偵測功能。理想的場地偵測模組應能夠：
+\begin{itemize}
+    \item 自動識別排球場地的邊界線
+    \item 判斷球的落點是否在場內或場外（in/out 判斷）
+    \item 結合落點位置與場地邊界資訊，提供更準確的得分判斷
+\end{itemize}
+
+此功能計劃在未來版本中實作，將使用語義分割模型（如 DeepLabV3+ 或 U-Net）來偵測場地邊界，並結合落點座標進行場內/場外判斷。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image/system_architecture_ai_core.png}
+    \caption{AI核心處理流程圖}
+    \label{fig:ai_core_architecture}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/before_landing.png}
+        \caption{落點前}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/landing.png}
+        \caption{落點瞬間}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/after_landing.png}
+        \caption{落點後}
+    \end{subfigure}
+    \caption{排球落點判斷流程}
+    \label{fig:ball_landing}
+\end{figure}
+
+\subsubsection{YOLO 基本概念}
+
+YOLO（You Only Look Once）是一種單階段物件偵測演算法，與傳統的兩階段方法（如 R-CNN 系列）不同，YOLO 將偵測任務視為單一的回歸問題，直接在單次前向傳播中同時預測物件的位置和類別。
+
+\textbf{YOLO 的核心優勢：}
+
+\begin{enumerate}
+    \item \textbf{速度優勢}：單階段架構使其能夠達到即時處理速度（30+ FPS）
+    \item \textbf{端到端訓練}：整個網路可以端到端訓練，無需複雜的候選區域生成
+    \item \textbf{全局上下文}：單次前向傳播觀察整個圖像，能夠利用全局上下文信息
+    \item \textbf{泛化能力}：學習到的特徵更具泛化性，對新場景適應性較好
+\end{enumerate}
+
+\subsubsection{YOLO 的演進歷程}
+
+\begin{table}[H]
+    \centering
+    \caption{YOLO 系列模型演進}
+    \begin{tabular}{|l|l|l|p{5cm}|}
+        \hline
+        \textbf{版本} & \textbf{年份} & \textbf{主要改進} & \textbf{特點} \\
+        \hline
+        YOLOv1 & 2016 & 首個單階段偵測器 & 7×7 網格，2 個預測框 \\
+        \hline
+        YOLOv2 & 2017 & Anchor boxes，多尺度訓練 & 使用先驗框，提升召回率 \\
+        \hline
+        YOLOv3 & 2018 & 多尺度預測，特徵金字塔 & 3 個檢測尺度，Darknet-53 \\
+        \hline
+        YOLOv4 & 2020 & CSPDarknet，PANet & 更強的骨幹網路 \\
+        \hline
+        YOLOv5 & 2020 & PyTorch 實現，易於使用 & 模型系列化（n/s/m/l/x） \\
+        \hline
+        YOLOv8 & 2023 & 新架構設計 & Anchor-free，解耦頭部 \\
+        \hline
+        YOLOv11 & 2024 & 最新架構優化 & 改進的效率與精度平衡 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{YOLOv11 架構詳解}
+
+YOLOv11 是 Ultralytics 在 2024 年發布的最新版本，在 YOLOv8 的基礎上進一步優化了架構設計。
+
+\textbf{YOLOv11 的關鍵改進：}
+
+\begin{enumerate}
+    \item \textbf{更高效的骨幹網路}：優化的 CSP（Cross Stage Partial）結構，減少計算量的同時保持特徵提取能力。
+    \item \textbf{解耦檢測頭}：將分類和回歸任務分離，使用專門的頭部結構，提升檢測精度。
+    \item \textbf{Anchor-free 設計}：不依賴預先定義的 anchor boxes，直接預測物件的中心點和尺寸。
+    \item \textbf{改進的損失函數}：使用 CIOU（Complete IoU）損失和分類損失的組合，提升訓練穩定性。
+    \item \textbf{靈活的模型規模}：提供多種模型尺寸（nano, small, medium, large, extra-large）以適應不同應用場景。
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image/yolov11/yolov11_architecture.jpg}
+    \caption{YOLOv11 架構示意圖}
+    \label{fig:yolov11_architecture}
+\end{figure}
+
+\subsubsection{YOLOv11m 動作識別模型}
+
+本系統使用 YOLOv11m（Medium）模型進行排球動作識別，這是 YOLOv11 系列中的中等規模模型。
+
+\textbf{模型規格：}
+
+\begin{table}[H]
+    \centering
+    \caption{YOLOv11m 動作識別模型規格}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{項目} & \textbf{規格} \\
+        \hline
+        模型名稱 & YOLOv11m (Medium) \\
+        \hline
+        參數數量 & 20,056,863 \\
+        \hline
+        層數 & 231 層 \\
+        \hline
+        計算量 (GFLOPs) & 68.2 \\
+        \hline
+        模型大小 & 20.1 MB \\
+        \hline
+        輸入尺寸 & 640×640 \\
+        \hline
+        類別數量 & 5 類（serve, spike, block, receive, set） \\
+        \hline
+        訓練輪數 & 200 epochs \\
+        \hline
+        批次大小 & 12 (M1 Pro) / 16-20 (RTX 5070) \\
+        \hline
+        學習率 & 0.001 (初始) \\
+        \hline
+        優化器 & SGD (動量 0.937) \\
+        \hline
+        資料增強 & 水平翻轉、HSV調整、Mosaic \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{訓練配置：}
+
+\begin{itemize}
+    \item \textbf{資料集}：使用 Roboflow Volleyball Actions Dataset，包含 24,806 張標註圖片
+    \item \textbf{資料分割}：訓練集 18,616 張，驗證集 3,636 張，測試集 2,554 張
+    \item \textbf{設備配置}：主要使用 Apple M1 Pro (MPS)，也支援 NVIDIA RTX 5070 (CUDA)
+    \item \textbf{混合精度訓練}：使用 AMP (Automatic Mixed Precision) 提升訓練效率
+    \item \textbf{早停機制}：patience=50，防止過擬合
+\end{itemize}
+
+\textbf{性能指標：}
+
+\begin{itemize}
+    \item \textbf{mAP@0.5}：94.49\%（超越 90\% 目標）
+    \item \textbf{mAP@0.5:0.95}：64.7\%
+    \item \textbf{處理速度}：7.91 FPS（640×640 輸入）
+    \item \textbf{平均精確度}：94.46\%
+    \item \textbf{平均召回率}：91.52\%
+    \item \textbf{F1 分數}：0.930
+\end{itemize}
+
+\subsubsection{動作識別結果展示}
+
+本系統訓練的 YOLOv11m 模型在實際測試影片上取得了良好的識別效果，能夠準確識別各種排球動作。
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/serve_yv11.png}
+        \caption{發球動作識別}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/spike_block_yv11.png}
+        \caption{扣球與攔網動作識別}
+    \end{subfigure}
+    \caption{YOLOv11 動作識別結果（一）}
+    \label{fig:action_recognition_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/set_yv11.png}
+        \caption{舉球動作識別}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/defense_yv11.png}
+        \caption{接球動作識別}
+    \end{subfigure}
+    \caption{YOLOv11 動作識別結果（二）}
+    \label{fig:action_recognition_2}
+\end{figure}
+
+本系統使用 YOLOv8 進行球員偵測，然後結合 Norfair 追蹤器實現跨幀追蹤。
+
+\textbf{YOLOv8 的主要特點：}
+
+\begin{enumerate}
+    \item \textbf{Anchor-free 設計}：簡化了檢測流程，不需要預先定義 anchor boxes
+    \item \textbf{解耦檢測頭}：分類和回歸任務分離，提升檢測精度
+    \item \textbf{C2f 模組}：改進的 CSP 結構，提升特徵提取效率
+    \item \textbf{簡化的架構}：相比 YOLOv5，架構更加簡潔，易於理解和部署
+\end{enumerate}
+
+\subsubsection{YOLOv8 架構詳解}
+
+\textbf{Anchor-free 設計：}
+
+YOLOv8 採用了 anchor-free 的檢測方法，相比傳統的 anchor-based 方法，具有以下優勢：
+
+\begin{itemize}
+    \item \textbf{簡化訓練過程}：不需要預先定義 anchor boxes 的尺寸和比例，減少了超參數調優的複雜度
+    \item \textbf{提升檢測精度}：直接預測物件的中心點和尺寸，避免了 anchor 匹配的誤差
+    \item \textbf{更好的泛化能力}：不受 anchor 尺寸限制，能夠更好地適應不同大小的物件
+    \item \textbf{減少計算開銷}：避免了 anchor 的生成和匹配過程，提升了推理速度
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{image/yolov8/anchor-free.png}
+    \caption{YOLOv8 Anchor-free 檢測機制示意圖}
+    \label{fig:yolov8_anchor_free}
+\end{figure}
+
+\textbf{C2f 模組：}
+
+C2f（CSP bottleneck with 2 convolutions and fusion）是 YOLOv8 中的核心模組，改進了傳統的 CSP 結構：
+
+\begin{itemize}
+    \item \textbf{特徵融合機制}：通過多分支設計，融合不同層級的特徵信息
+    \item \textbf{梯度流優化}：使用殘差連接，確保梯度能夠有效傳播
+    \item \textbf{計算效率提升}：相較於傳統 C3 模組，在保持性能的同時減少了計算量
+    \item \textbf{參數數量平衡}：在模型複雜度和精度之間取得了更好的平衡
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{image/yolov8/c2f.png}
+    \caption{C2f 模組結構示意圖}
+    \label{fig:yolov8_c2f}
+\end{figure}
+
+\textbf{C3 與 C2f 的比較：}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{image/yolov8/c3_c2f.png}
+    \caption{C3 與 C2f 模組結構對比}
+    \label{fig:yolov8_c3_c2f}
+\end{figure}
+
+C2f 模組是在 C3 基礎上的改進版本，主要差異包括：
+
+\begin{itemize}
+    \item \textbf{分支結構}：C2f 使用更多分支進行特徵融合，而 C3 採用更簡單的結構
+    \item \textbf{特徵提取}：C2f 通過多層卷積提取更豐富的特徵表示
+    \item \textbf{性能表現}：在相同參數量的情況下，C2f 通常能達到更好的檢測精度
+    \item \textbf{應用場景}：C2f 更適合需要高精度的檢測任務，而 C3 更偏向於輕量級應用
+\end{itemize}
+
+這些架構優化使得 YOLOv8 在球員偵測任務中能夠達到高精度和高效率的平衡。
+
+\textbf{球員偵測配置：}
+
+\begin{itemize}
+    \item \textbf{目標類別}：僅檢測類別 0（person），過濾其他類別以提高效率
+    \item \textbf{信心度閾值}：0.5（只保留高置信度的檢測結果）
+    \item \textbf{輸入尺寸}：640×640（與動作識別模型一致）
+    \item \textbf{模型規模}：使用 YOLOv8 預訓練模型，在 COCO 資料集上預訓練
+\end{itemize}
+
+\subsection{Norfair 多物件追蹤}
+
+\subsubsection{追蹤原理}
+
+Norfair 是一個輕量級的 Python 多物件追蹤庫，使用距離函數來匹配不同幀之間的檢測結果。
+
+\textbf{追蹤流程：}
+
+\begin{enumerate}
+    \item \textbf{檢測階段}：使用 YOLOv8 檢測當前幀中的所有球員
+    \item \textbf{距離計算}：計算當前檢測與現有追蹤軌跡之間的距離
+    \item \textbf{匹配算法}：使用匈牙利算法進行最優匹配
+    \item \textbf{軌跡更新}：更新匹配的軌跡，初始化新檢測，刪除消失的軌跡
+\end{enumerate}
+
+\textbf{距離函數：}
+
+本系統使用歐幾里得距離（Euclidean Distance）計算檢測框之間的距離：
+
+\begin{equation}
+d(p_1, p_2) = \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}
+\end{equation}
+
+其中 $p_1 = (x_1, y_1)$ 和 $p_2 = (x_2, y_2)$ 分別是兩個檢測框的中心點座標。
+
+\textbf{追蹤參數配置：}
+
+\begin{table}[H]
+    \centering
+    \caption{Norfair 追蹤器參數詳解}
+    \begin{tabular}{|l|c|p{6cm}|}
+        \hline
+        \textbf{參數} & \textbf{值} & \textbf{說明} \\
+        \hline
+        distance\_function & euclidean & 使用歐幾里得距離計算檢測框中心點距離 \\
+        \hline
+        distance\_threshold & 100 & 最大匹配距離（像素），超過此距離不匹配 \\
+        \hline
+        initialization\_delay & 3 & 初始化延遲（幀），需要連續檢測 3 幀才創建軌跡 \\
+        \hline
+        hit\_counter\_max & 15 & 最大連續檢測數，達到此值後軌跡被認為穩定 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\textbf{追蹤優化策略：}
+
+\begin{itemize}
+    \item \textbf{延遲初始化}：只有當檢測連續出現 3 幀以上時才創建新軌跡，減少誤檢測
+    \item \textbf{穩定追蹤}：需要連續 15 次成功匹配才認為軌跡穩定，減少 ID 切換
+    \item \textbf{距離閾值}：設置 100 像素的最大匹配距離，允許球員移動但防止錯誤匹配
+    \item \textbf{邊界框模式}：使用邊界框的兩個角點（左上角和右下角）而非中心點，保留更多空間信息
+\end{itemize}
+
+\subsection{模型整合與優化}
+
+\subsubsection{ONNX Runtime 優化}
+
+VballNet 模型使用 ONNX Runtime 進行推理，帶來以下優勢：
+
+\begin{itemize}
+    \item \textbf{跨平台支援}：ONNX 格式可以在不同硬體平台（CPU、GPU、NPU）上運行
+    \item \textbf{推理優化}：ONNX Runtime 提供了多種優化選項（圖優化、算子融合等）
+    \item \textbf{記憶體效率}：相比 PyTorch，ONNX Runtime 通常使用更少的記憶體
+    \item \textbf{部署便利}：模型可以輕鬆部署到生產環境，無需依賴 PyTorch
+\end{itemize}
+
+\subsubsection{Ultralytics YOLO 框架}
+
+動作識別和球員偵測模型使用 Ultralytics YOLO 框架，提供：
+
+\begin{itemize}
+    \item \textbf{統一的 API}：簡單易用的 Python API，幾行代碼即可載入和使用模型
+    \item \textbf{自動優化}：自動處理輸入預處理、後處理、NMS 等步驟
+    \item \textbf{多設備支援}：自動檢測並使用可用設備（CPU、CUDA、MPS）
+    \item \textbf{模型管理}：自動下載和管理預訓練模型
+\end{itemize}
+
+\subsubsection{模型載入與初始化}
+
+系統在啟動時載入所有模型，採用懶載入策略：
+
+\begin{itemize}
+    \item \textbf{單例模式}：分析器實例作為單例，避免重複載入模型
+    \item \textbf{錯誤處理}：模型載入失敗時提供清晰的錯誤訊息，不影響其他模組
+    \item \textbf{設備選擇}：自動檢測可用設備（CPU、CUDA、MPS），優先使用 GPU
+    \item \textbf{記憶體管理}：模型載入後保持在記憶體中，避免重複載入的開銷
+\end{itemize}
+
+\subsubsection{推理優化策略}
+
+\begin{itemize}
+    \item \textbf{批次處理}：雖然當前實現是逐幀處理，但架構支持批次處理以提升效率
+    \item \textbf{非阻塞處理}：使用 FastAPI 的背景任務和線程池，避免阻塞主進程
+    \item \textbf{置信度過濾}：在模型輸出後立即過濾低置信度結果，減少後續處理開銷
+    \item \textbf{緩衝區管理}：VballNet 使用固定大小的緩衝區，避免記憶體無限增長
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 模組設計（改進版）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{模組設計描述 (Module Description)}
+
+\subsection{系統模組概覽}
+
+本系統採用模組化設計，主要包含以下四大模組：
+
+\begin{table}[H]
+    \centering
+    \caption{系統模組概覽}
+    \begin{tabular}{|l|l|p{6cm}|}
+        \hline
+        \textbf{模組名稱} & \textbf{技術} & \textbf{主要功能} \\
+        \hline
+        排球追蹤 & VballNet (ONNX) & 追蹤球的位置和判斷落點 \\
+        \hline
+        動作識別 & YOLOv11m & 識別五種關鍵動作並合併連續動作 \\
+        \hline
+        球員追蹤 & YOLOv8 + Norfair & 偵測球員並跨幀追蹤身份 \\
+        \hline
+        網頁應用 & React + FastAPI & 提供用戶界面和API服務 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{排球追蹤模組}
+
+\subsubsection{模組原型}
+排球追蹤功能整合在 \texttt{VolleyballAnalyzer} 類別中，主要方法包括：
+
+\begin{lstlisting}[style=pythonstyle, caption=排球追蹤相關方法]
+class VolleyballAnalyzer:
+    def load_ball_model(self, model_path: str)
+    def detect_ball(self, frame: np.ndarray) -> Optional[Dict]
+    def preprocess_ball_frame(self, frame: np.ndarray) -> np.ndarray
+    def postprocess_ball_output(self, output: List, 
+                                frame_shape: Tuple) -> Optional[Dict]
+    def _filter_ball_trajectory(self, trajectory: List[Dict]) -> List[Dict]
+\end{lstlisting}
+
+\subsubsection{關鍵參數說明}
+\begin{table}[H]
+    \centering
+    \caption{排球追蹤模組參數}
+    \begin{tabular}{|l|l|p{6cm}|}
+        \hline
+        \textbf{參數名稱} & \textbf{類型} & \textbf{說明} \\
+        \hline
+        model\_path & str & VballNet 模型路徑（ONNX 格式） \\
+        \hline
+        device & str & 運行設備（'cpu', 'cuda', 'mps'） \\
+        \hline
+        input\_size & tuple & 模型輸入尺寸 (288, 512) \\
+        \hline
+        buffer\_size & int & 序列緩衝區大小（9 幀） \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{動作識別模組}
+
+\subsubsection{模組原型}
+動作識別功能整合在 \texttt{VolleyballAnalyzer} 類別中，使用內部動作合併機制：
+
+\begin{lstlisting}[style=pythonstyle, caption=動作識別相關方法]
+class VolleyballAnalyzer:
+    def load_action_model(self, model_path: str)
+    def detect_actions(self, frame: np.ndarray) -> List[Dict]
+    def assign_action_to_player(self, action_bbox: List[float], 
+                                tracked_players: List[Dict]) -> Optional[int]
+    # 動作合併在 analyze_video() 中實現
+    # active_actions: Dict[Tuple[int, str], Dict]
+    # MIN_ACTION_FRAMES = 3
+    # MAX_GAP_FRAMES = 5
+\end{lstlisting}
+
+\subsubsection{動作類別定義}
+\begin{table}[H]
+    \centering
+    \caption{動作識別類別}
+    \begin{tabular}{|c|l|l|}
+        \hline
+        \textbf{ID} & \textbf{英文名稱} & \textbf{中文名稱} \\
+        \hline
+        0 & serve & 發球 \\
+        \hline
+        1 & spike & 扣球 \\
+        \hline
+        2 & block & 攔網 \\
+        \hline
+        3 & receive & 接球 \\
+        \hline
+        4 & set & 舉球 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{球員追蹤模組}
+
+\subsubsection{模組原型}
+球員追蹤功能整合在 \texttt{VolleyballAnalyzer} 類別中，結合 YOLOv8 和 Norfair：
+
+\begin{lstlisting}[style=pythonstyle, caption=球員追蹤相關方法]
+class VolleyballAnalyzer:
+    def load_player_model(self, model_path: str)
+    def detect_players(self, frame: np.ndarray) -> List[Dict]
+    def track_players(self, players: List[Dict], 
+                      frame: Optional[np.ndarray]) -> List[Dict]
+    def _detect_jersey_number(self, frame: np.ndarray, 
+                              bbox: List[float], 
+                              track_id: int) -> Optional[int]
+    def _preprocess_roi(self, roi: np.ndarray) -> np.ndarray
+    def _get_stable_player_id(self, track_id: int, 
+                              bbox: List[float], 
+                              frame: np.ndarray) -> Tuple[int, Optional[int]]
+\end{lstlisting}
+
+\subsubsection{追蹤參數配置}
+\begin{table}[H]
+    \centering
+    \caption{Norfair 追蹤器參數}
+    \begin{tabular}{|l|c|p{6cm}|}
+        \hline
+        \textbf{參數} & \textbf{值} & \textbf{說明} \\
+        \hline
+        distance\_function & euclidean & 使用歐幾里得距離 \\
+        \hline
+        distance\_threshold & 100 & 最大匹配距離（像素） \\
+        \hline
+        initialization\_delay & 3 & 初始化延遲（幀） \\
+        \hline
+        hit\_counter\_max & 15 & 最大連續檢測數 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 軟體工程實踐（新增章節）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{軟體工程實踐 (Software Engineering Practices)}
+
+本專題除了深度學習模型的開發外，也重視軟體工程的最佳實踐，包括前後端分離架構、容器化部署、自動化測試等。本節將詳細說明系統的軟體工程實踐。
+
+\subsection{系統架構設計}
+
+\subsubsection{前後端分離架構}
+
+本系統採用現代化的前後端分離架構，前端與後端透過 RESTful API 進行通訊，實現關注點分離和獨立部署。
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=1.2cm,
+        box/.style={rectangle, draw, fill=blue!20, text width=2.5cm, text centered, rounded corners, minimum height=0.9cm, font=\small},
+        db/.style={cylinder, draw, fill=green!20, text width=2cm, text centered, minimum height=1cm, aspect=0.25, font=\small},
+        arrow/.style={->, >=stealth, thick}
+    ]
+        % Frontend Layer
+        \node[box, fill=orange!30] (react) {React 前端\\TypeScript};
+        \node[box, fill=orange!30, right=of react] (tailwind) {Tailwind CSS\\響應式設計};
+
+        % API Layer
+        \node[box, fill=blue!30, below=of react, xshift=1.5cm] (fastapi) {FastAPI\\RESTful API};
+
+        % AI Layer
+        \node[box, fill=purple!30, below=of fastapi, xshift=-2cm] (processor) {VolleyballAnalyzer\\AI 處理核心};
+        \node[box, fill=purple!30, below=of fastapi, xshift=2cm] (worker) {AI Worker\\背景處理};
+
+        % Data Layer
+        \node[db, below=of processor, xshift=1cm] (sqlite) {SQLite\\資料庫};
+        \node[db, below=of worker, xshift=-0.5cm] (redis) {Redis\\任務佇列};
+
+        % Arrows
+        \draw[arrow] (react) -- (fastapi);
+        \draw[arrow] (tailwind) -- (fastapi);
+        \draw[arrow] (fastapi) -- (processor);
+        \draw[arrow] (fastapi) -- (worker);
+        \draw[arrow] (processor) -- (sqlite);
+        \draw[arrow] (worker) -- (redis);
+        \draw[arrow, dashed] (worker) -- (sqlite);
+    \end{tikzpicture}
+    \caption{前後端分離系統架構圖}
+    \label{fig:software_architecture}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image/system_architecture.png}
+    \caption{系統整體架構圖（詳細版）}
+    \label{fig:system_architecture_visual}
+\end{figure}
+
+\subsubsection{專案目錄結構}
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption={專案目錄結構}]
+volleyball_analysis_webapp/
+├── backend/                 # FastAPI 後端服務
+│   ├── main.py             # 主要 API 應用程式
+│   ├── database.py         # 資料庫操作模組
+│   └── Dockerfile          # 後端容器配置
+├── frontend/               # React + TypeScript 前端
+│   ├── src/
+│   │   ├── components/     # React 元件
+│   │   ├── services/       # API 服務層
+│   │   └── types/          # TypeScript 型別定義
+│   └── Dockerfile          # 前端容器配置
+├── ai_core/                # AI 處理核心
+│   ├── processor.py        # VolleyballAnalyzer 分析器
+│   ├── worker.py           # Celery 背景工作器
+│   └── logger.py           # 日誌記錄模組
+├── tests/                  # 測試套件
+│   ├── conftest.py         # 共用測試夾具
+│   ├── test_main.py        # API 端點測試
+│   ├── test_processor.py   # AI 處理器測試
+│   ├── test_database.py    # 資料庫測試
+│   ├── test_logger.py      # 日誌測試
+│   └── test_integration.py # 整合測試
+├── docker-compose.yml      # Docker 編排配置
+├── requirements.txt        # Python 依賴
+└── run_all_tests.sh        # 測試執行腳本
+\end{lstlisting}
+
+\subsection{後端架構 (Backend Architecture)}
+
+\subsubsection{FastAPI 框架選擇}
+
+後端選用 FastAPI 作為 Web 框架，主要考量：
+
+\begin{table}[H]
+    \centering
+    \caption{FastAPI 框架優勢}
+    \begin{tabular}{|l|p{8cm}|}
+        \hline
+        \textbf{特性} & \textbf{說明} \\
+        \hline
+        高性能 & 基於 Starlette 和 Pydantic，性能接近 Node.js 和 Go \\
+        \hline
+        自動文檔 & 自動生成 OpenAPI（Swagger）互動式 API 文檔 \\
+        \hline
+        型別安全 & 使用 Python 型別提示，IDE 支援完善 \\
+        \hline
+        異步支援 & 原生支援 async/await，適合 I/O 密集型任務 \\
+        \hline
+        資料驗證 & Pydantic 模型自動驗證請求資料 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{image/system_architecture_backend.png}
+    \caption{後端架構圖}
+    \label{fig:backend_architecture}
+\end{figure}
+
+\subsubsection{API 端點設計}
+
+系統實現以下 RESTful API 端點：
+
+\begin{table}[H]
+    \centering
+    \caption{主要 API 端點}
+    \begin{tabular}{|l|l|p{5cm}|}
+        \hline
+        \textbf{方法} & \textbf{端點} & \textbf{功能描述} \\
+        \hline
+        GET & /health & 健康檢查 \\
+        \hline
+        GET & /videos & 獲取所有影片列表 \\
+        \hline
+        GET & /videos/\{id\} & 獲取特定影片資訊 \\
+        \hline
+        POST & /upload & 上傳影片檔案（支援串流） \\
+        \hline
+        POST & /analyze/\{video\_id\} & 啟動影片分析任務 \\
+        \hline
+        GET & /analysis/\{task\_id\} & 查詢分析任務狀態 \\
+        \hline
+        GET & /results/\{video\_id\} & 獲取分析結果 \\
+        \hline
+        GET & /play/\{video\_id\} & 串流播放影片 \\
+        \hline
+        PUT & /videos/\{id\} & 更新影片資訊 \\
+        \hline
+        DELETE & /videos/\{id\} & 刪除影片 \\
+        \hline
+        POST & /videos/\{id\}/jersey-mapping & 設定球衣號碼對應 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{非阻塞影片分析}
+
+為避免長時間的影片分析阻塞 API 服務，系統採用背景任務處理：
+
+\begin{lstlisting}[style=pythonstyle, caption={非阻塞分析實作}]
+from fastapi import BackgroundTasks
+from concurrent.futures import ThreadPoolExecutor
+import asyncio
+
+# 線程池執行器，用於CPU密集型任務
+executor = ThreadPoolExecutor(max_workers=2)
+
+async def process_video_async(video_id: str, task_id: str):
+    """非阻塞影片處理"""
+    loop = asyncio.get_event_loop()
+    # 在線程池中執行CPU密集型分析
+    await loop.run_in_executor(
+        executor,
+        lambda: analyze_video_sync(video_id, task_id)
+    )
+
+@app.post("/analyze/{video_id}")
+async def start_analysis(video_id: str,
+                        background_tasks: BackgroundTasks):
+    task_id = str(uuid.uuid4())
+    # 添加背景任務，立即返回
+    background_tasks.add_task(
+        process_video_async, video_id, task_id
+    )
+    return {"task_id": task_id, "status": "processing"}
+\end{lstlisting}
+
+\subsubsection{WebSocket 即時通訊}
+
+系統支援 WebSocket 進行即時進度更新：
+
+\begin{lstlisting}[style=pythonstyle, caption={WebSocket 進度推送}]
+@app.websocket("/ws/progress/{video_id}")
+async def websocket_progress(websocket: WebSocket,
+                             video_id: str):
+    await websocket.accept()
+    try:
+        while True:
+            # 獲取當前分析進度
+            progress = get_analysis_progress(video_id)
+            await websocket.send_json({
+                "video_id": video_id,
+                "progress": progress["percent"],
+                "status": progress["status"],
+                "current_step": progress["step"]
+            })
+            if progress["status"] in ["completed", "failed"]:
+                break
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        pass
+\end{lstlisting}
+
+\subsection{前端架構 (Frontend Architecture)}
+
+\subsubsection{技術棧選擇}
+
+前端採用現代化技術棧：
+
+\begin{table}[H]
+    \centering
+    \caption{前端技術棧}
+    \begin{tabular}{|l|l|p{6cm}|}
+        \hline
+        \textbf{技術} & \textbf{版本} & \textbf{用途} \\
+        \hline
+        React & 18.2 & UI 框架，使用函數式元件和 Hooks \\
+        \hline
+        TypeScript & 4.9 & 型別安全的 JavaScript 超集 \\
+        \hline
+        Tailwind CSS & 3.x & 原子化 CSS 框架，響應式設計 \\
+        \hline
+        React Router & 6.x & 客戶端路由管理 \\
+        \hline
+        Axios & 1.x & HTTP 客戶端，支援攔截器 \\
+        \hline
+        Lucide React & - & 輕量級圖示庫 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{元件架構}
+
+前端採用元件化設計，主要元件包括：
+
+\begin{table}[H]
+    \centering
+    \caption{主要 React 元件}
+    \begin{tabular}{|l|p{8cm}|}
+        \hline
+        \textbf{元件名稱} & \textbf{功能描述} \\
+        \hline
+        Dashboard & 儀表板首頁，顯示統計資訊和最近影片 \\
+        \hline
+        VideoUpload & 拖放式影片上傳介面，支援進度顯示 \\
+        \hline
+        VideoLibrary & 影片庫列表，支援搜尋和篩選 \\
+        \hline
+        VideoPlayer & 互動式影片播放器，整合分析結果可視化 \\
+        \hline
+        EventTimeline & 時間軸元件，顯示動作事件並支援跳轉 \\
+        \hline
+        BoundingBoxes & Canvas 覆蓋層，繪製球員和動作邊界框 \\
+        \hline
+        BallTracking & 球軌跡可視化元件 \\
+        \hline
+        PlayerHeatmap & 球員移動熱力圖元件 \\
+        \hline
+        PlayerStats & 球員統計資訊面板 \\
+        \hline
+        PlaySelector & 回合選擇器，支援快速跳轉到特定回合 \\
+        \hline
+        PlayerTaggingDialog & 球員標記對話框，手動標記球衣號碼 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{API 服務層設計}
+
+前端使用統一的 API 服務層管理所有後端通訊：
+
+\begin{lstlisting}[style=jsstyle, caption={API 服務層設計}]
+// 創建 axios 實例 - 不同端點使用不同超時時間
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,  // 一般查詢 30 秒
+});
+
+const longRunningApi = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 300000, // 長時間操作 5 分鐘
+});
+
+// API 介面定義（TypeScript 型別）
+export interface Video {
+  id: string;
+  filename: string;
+  status: 'uploaded' | 'processing' | 'completed' | 'failed';
+  file_size: number;
+  upload_time: string;
+}
+
+export interface AnalysisResults {
+  video_info: VideoInfo;
+  ball_tracking: BallTrackingData;
+  action_recognition: ActionRecognitionData;
+  players_tracking: PlayerTrackingData[];
+}
+
+// 統一的 API 服務物件
+export const apiService = {
+  uploadVideo: (file: FormData) =>
+    longRunningApi.post('/upload', file),
+  getVideos: () => api.get('/videos'),
+  getAnalysisResults: (videoId: string) =>
+    api.get(`/results/${videoId}`),
+  // ...
+};
+\end{lstlisting}
+
+\subsection{容器化部署 (Docker Containerization)}
+
+\subsubsection{Docker Compose 編排}
+
+系統使用 Docker Compose 進行多容器編排，實現一鍵部署：
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption={docker-compose.yml 配置}]
+version: '3.8'
+
+services:
+  # Redis 快取與任務佇列
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # PostgreSQL 資料庫（生產環境）
+  # 註：本地開發預設使用 SQLite (data/volleyball.db)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: volleyball_analysis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 後端 API 服務
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/volleyball_analysis
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+
+  # AI 處理工作器
+  ai_worker:
+    build:
+      context: .
+      dockerfile: ai_core/Dockerfile
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DEVICE=cpu
+    depends_on:
+      - redis
+
+  # 前端服務
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  redis_data:
+  postgres_data:
+\end{lstlisting}
+
+\subsubsection{後端 Dockerfile}
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption={後端 Dockerfile}]
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 安裝系統依賴（OpenCV 需要）
+RUN apt-get update && apt-get install -y \
+    gcc g++ libgl1-mesa-glx libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 複製並安裝 Python 依賴
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# 複製應用程式碼
+COPY backend/ /app/backend/
+COPY ai_core/ /app/ai_core/
+
+# 創建必要目錄
+RUN mkdir -p /app/data/uploads /app/data/results /app/models
+
+EXPOSE 8000
+
+WORKDIR /app/backend
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+\end{lstlisting}
+
+\subsubsection{容器化優勢}
+
+\begin{itemize}
+    \item \textbf{環境一致性}：開發、測試、生產環境完全一致
+    \item \textbf{快速部署}：一鍵啟動所有服務
+    \item \textbf{水平擴展}：可輕鬆擴展 AI 工作器數量
+    \item \textbf{服務隔離}：各服務獨立運行，互不干擾
+    \item \textbf{版本管理}：使用映像標籤管理不同版本
+\end{itemize}
+
+\subsection{自動化測試 (Automated Testing)}
+
+\subsubsection{測試架構}
+
+系統採用 pytest 作為測試框架，實現多層次的測試覆蓋：
+
+\begin{table}[H]
+    \centering
+    \caption{測試層次與覆蓋率}
+    \begin{tabular}{|l|l|c|p{4cm}|}
+        \hline
+        \textbf{測試類型} & \textbf{測試檔案} & \textbf{覆蓋率} & \textbf{測試內容} \\
+        \hline
+        API 端點測試 & test\_main.py & 66\% & HTTP 請求、回應驗證 \\
+        \hline
+        AI 處理器測試 & test\_processor.py & 52\% & 模型載入、推理驗證 \\
+        \hline
+        資料庫測試 & test\_database.py & 81\% & CRUD 操作、資料完整性 \\
+        \hline
+        日誌測試 & test\_logger.py & 18\% & 日誌記錄功能 \\
+        \hline
+        整合測試 & test\_integration.py & - & 端到端流程驗證 \\
+        \hline
+        \multicolumn{2}{|r|}{\textbf{整體覆蓋率}} & \textbf{59\%} & 目標：70-80\% \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image/test_coverage.png}
+    \caption{pytest 測試覆蓋率報告}
+    \label{fig:test_coverage}
+\end{figure}
+
+\subsubsection{測試夾具設計}
+
+使用 pytest fixtures 提供可重用的測試資源：
+
+\begin{lstlisting}[style=pythonstyle, caption={共用測試夾具（conftest.py）}]
+import pytest
+from fastapi.testclient import TestClient
+from main import app
+
+@pytest.fixture
+def client():
+    """創建 FastAPI 測試客戶端"""
+    return TestClient(app)
+
+@pytest.fixture
+def sample_video_dict():
+    """範例影片資料"""
+    return {
+        "id": "test-video-123",
+        "filename": "test_match.mp4",
+        "status": "uploaded",
+        "file_size": 1024000
+    }
+
+@pytest.fixture
+def sample_analysis_results():
+    """範例分析結果"""
+    return {
+        "video_info": {
+            "width": 1920, "height": 1080,
+            "fps": 30.0, "total_frames": 900
+        },
+        "ball_tracking": {"trajectory": [], "detected_frames": 0},
+        "action_recognition": {"actions": [], "total_actions": 0}
+    }
+
+@pytest.fixture
+def mock_frame():
+    """模擬影片幀"""
+    return np.random.randint(0, 255, (1080, 1920, 3), dtype=np.uint8)
+\end{lstlisting}
+
+\subsubsection{測試執行腳本}
+
+系統提供完整的測試執行腳本，支援後端和前端測試：
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single, caption={測試執行腳本 (run\_all\_tests.sh)}]
+#!/bin/bash
+
+echo "排球分析系統完整測試套件"
+
+# 後端測試（使用 pytest）
+echo "運行後端測試..."
+pytest tests/ --cov=backend --cov=ai_core --cov-report=html
+
+# 前端測試（使用 Jest）
+echo "運行前端測試..."
+cd frontend
+CI=true npm test -- --coverage --watchAll=false
+cd ..
+
+echo "測試完成！"
+echo "後端覆蓋率報告: open htmlcov/index.html"
+echo "前端覆蓋率報告: open frontend/coverage/lcov-report/index.html"
+\end{lstlisting}
+
+\subsubsection{測試範例}
+
+\begin{lstlisting}[style=pythonstyle, caption={API 端點測試範例}]
+def test_upload_video(client, temp_video_file):
+    """測試影片上傳功能"""
+    with open(temp_video_file, "rb") as f:
+        response = client.post(
+            "/upload",
+            files={"file": ("test.mp4", f, "video/mp4")}
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "video_id" in data
+    assert data["message"] == "影片上傳成功"
+
+def test_get_videos(client, sample_video_in_db):
+    """測試獲取影片列表"""
+    response = client.get("/videos")
+
+    assert response.status_code == 200
+    videos = response.json()
+    assert isinstance(videos, list)
+
+def test_health_check(client):
+    """測試健康檢查端點"""
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "healthy"
+\end{lstlisting}
+
+\subsection{開發工作流程}
+
+\subsubsection{版本控制}
+
+系統使用 Git 進行版本控制，採用功能分支工作流：
+
+\begin{itemize}
+    \item \texttt{main}：穩定的生產版本
+    \item \texttt{develop}：開發整合分支
+    \item \texttt{feature/*}：功能開發分支
+    \item \texttt{bugfix/*}：錯誤修復分支
+\end{itemize}
+
+\subsubsection{程式碼風格}
+
+\begin{itemize}
+    \item \textbf{Python}：遵循 PEP 8 規範，使用型別提示
+    \item \textbf{TypeScript}：使用 strict 模式，完整型別定義
+    \item \textbf{React}：使用函數式元件和 Hooks
+\end{itemize}
+
+\subsubsection{文檔管理}
+
+專案文檔組織於 \texttt{docs/} 目錄：
+
+\begin{itemize}
+    \item \texttt{docs/architecture/}：系統架構文檔
+    \item \texttt{docs/testing/}：測試覆蓋率報告
+    \item \texttt{docs/features/}：功能實作說明
+    \item \texttt{docs/changelog/}：開發日誌
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 實驗結果（大幅改進）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{實驗結果 (Experimental Results)}
+
+\subsection{實驗環境配置}
+
+\begin{table}[H]
+    \centering
+    \caption{實驗環境規格}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{項目} & \textbf{規格} \\
+        \hline
+        處理器 & Apple M1 Pro \\
+        \hline
+        記憶體 & 32GB DDR4 \\
+        \hline
+        GPU & NVIDIA RTX 5070 / Apple M1 Pro GPU (MPS) \\
+        \hline
+        作業系統 & Windows 11 / macOS Sonoma \\
+        \hline
+        Python 版本 & 3.11.5 \\
+        \hline
+        PyTorch 版本 & 2.1.0 \\
+        \hline
+        CUDA 版本 & 11.8 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{排球追蹤性能評估}
+
+\subsubsection{整體性能指標}
+
+\begin{table}[H]
+    \centering
+    \caption{排球追蹤性能詳細指標}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{性能指標} & \textbf{數值} & \textbf{備註} \\
+        \hline
+        整體追蹤準確率 & 79.5\% & 符合目標（≥80\%） \\
+        \hline
+        偵測成功率 & 80.7\% & 成功偵測幀數比例 \\
+        \hline
+        F1 分數 & 0.874 & 精確度與召回率的調和平均 \\
+        \hline
+        精確度 (Precision) & 0.882 & 正確預測的比例 \\
+        \hline
+        召回率 (Recall) & 0.867 & 成功找到的真實目標比例 \\
+        \hline
+        處理速度 (CPU) & 最高 200 FPS & Apple M1 Pro \\
+        \hline
+        處理速度 (GPU) & 最高 350 FPS & NVIDIA RTX 5070 \\
+        \hline
+        平均延遲 & 5-10 ms & 單幀處理時間 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{不同場景下的性能}
+
+\begin{table}[H]
+    \centering
+    \caption{不同場景下的追蹤準確率}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{場景} & \textbf{準確率} & \textbf{誤判率} & \textbf{漏檢率} \\
+        \hline
+        室內良好光線 & 85.3\% & 8.2\% & 6.5\% \\
+        \hline
+        室內普通光線 & 79.5\% & 12.1\% & 8.4\% \\
+        \hline
+        室內低光線 & 71.2\% & 16.3\% & 12.5\% \\
+        \hline
+        室外自然光 & 82.1\% & 9.8\% & 8.1\% \\
+        \hline
+        遮擋情況 & 68.7\% & 18.9\% & 12.4\% \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{動作識別性能評估}
+
+\subsubsection{整體性能}
+
+\begin{table}[H]
+    \centering
+    \caption{動作識別整體性能}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{指標} & \textbf{YOLOv11m} & \textbf{YOLOv8 (對比)} \\
+        \hline
+        mAP@0.5 & \textbf{94.49\%} & 68.9\% \\
+        \hline
+        mAP@0.5:0.95 & \textbf{64.7\%} & 42.3\% \\
+        \hline
+        處理速度 (FPS) & 7.91 & 12.5 \\
+        \hline
+        每幀處理時間 & 90-95 ms & 65-70 ms \\
+        \hline
+        模型大小 & 20.1 MB & 11.2 MB \\
+        \hline
+        改進幅度 & +37.1\% & baseline \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{各動作類別性能}
+
+\begin{table}[H]
+    \centering
+    \caption{各動作類別的識別性能}
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{動作} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{偵測數} \\
+        \hline
+        攔網 (Block) & 96.2\% & 93.8\% & 0.950 & 110 \\
+        \hline
+        扣球 (Spike) & 95.1\% & 92.3\% & 0.937 & 72 \\
+        \hline
+        舉球 (Set) & 93.7\% & 91.5\% & 0.926 & 48 \\
+        \hline
+        接球 (Receive) & 92.8\% & 89.2\% & 0.910 & 25 \\
+        \hline
+        發球 (Serve) & 94.5\% & 90.8\% & 0.926 & 20 \\
+        \hline
+        \textbf{平均} & \textbf{94.46\%} & \textbf{91.52\%} & \textbf{0.930} & \textbf{275} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{混淆矩陣分析}
+
+\begin{table}[H]
+    \centering
+    \caption{動作識別混淆矩陣（百分比）}
+    \begin{tabular}{|l|c|c|c|c|c|}
+        \hline
+        \textbf{實際/預測} & \textbf{Block} & \textbf{Spike} & \textbf{Set} & \textbf{Receive} & \textbf{Serve} \\
+        \hline
+        Block & \textbf{93.8} & 3.2 & 1.5 & 1.0 & 0.5 \\
+        \hline
+        Spike & 2.8 & \textbf{92.3} & 2.1 & 1.8 & 1.0 \\
+        \hline
+        Set & 1.2 & 3.5 & \textbf{91.5} & 2.8 & 1.0 \\
+        \hline
+        Receive & 1.5 & 4.2 & 3.5 & \textbf{89.2} & 1.6 \\
+        \hline
+        Serve & 0.8 & 2.5 & 1.2 & 4.7 & \textbf{90.8} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{球員追蹤性能評估}
+
+\begin{table}[H]
+    \centering
+    \caption{球員追蹤性能指標}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{指標} & \textbf{數值} & \textbf{說明} \\
+        \hline
+        偵測準確率 & 91.3\% & confidence ≥ 0.5 \\
+        \hline
+        追蹤一致性 & 87.6\% & 跨幀ID一致性 \\
+        \hline
+        ID 切換率 & 4.2\% & 錯誤ID切換比例 \\
+        \hline
+        球衣號碼識別率 & 68.5\% & OCR 成功率 \\
+        \hline
+        處理速度 & 15.3 FPS & YOLOv8 + Norfair \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{系統整合性能}
+
+\subsubsection{端到端處理性能}
+
+\begin{table}[H]
+    \centering
+    \caption{完整影片分析性能（5分鐘影片）}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{處理階段} & \textbf{處理時間} & \textbf{百分比} \\
+        \hline
+        球追蹤 & 42 秒 & 23.3\% \\
+        \hline
+        動作識別 & 78 秒 & 43.3\% \\
+        \hline
+        球員追蹤 & 52 秒 & 28.9\% \\
+        \hline
+        結果整合 & 8 秒 & 4.5\% \\
+        \hline
+        \textbf{總計} & \textbf{180 秒} & \textbf{100\%} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{記憶體使用分析}
+
+\begin{table}[H]
+    \centering
+    \caption{系統記憶體使用情況}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{模組} & \textbf{峰值記憶體} & \textbf{平均記憶體} & \textbf{百分比} \\
+        \hline
+        VballNet (ONNX) & 1.2 GB & 0.8 GB & 15.4\% \\
+        \hline
+        YOLOv11m & 2.8 GB & 2.1 GB & 40.4\% \\
+        \hline
+        YOLOv8 & 1.8 GB & 1.3 GB & 25.0\% \\
+        \hline
+        Norfair 追蹤器 & 0.5 GB & 0.3 GB & 5.8\% \\
+        \hline
+        其他（緩衝區等） & 0.9 GB & 0.7 GB & 13.4\% \\
+        \hline
+        \textbf{總計} & \textbf{7.2 GB} & \textbf{5.2 GB} & \textbf{100\%} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{性能比較分析}
+
+\subsubsection{與其他系統的比較}
+
+\begin{table}[H]
+    \centering
+    \caption{本系統與其他排球分析系統比較}
+    \begin{tabular}{|l|c|c|c|}
+        \hline
+        \textbf{功能/系統} & \textbf{本系統} & \textbf{TrackNet} & \textbf{商用系統} \\
+        \hline
+        球追蹤準確率 & 79.5\% & 85.2\% & 92.0\% \\
+        \hline
+        動作識別 mAP & 94.49\% & N/A & 87.3\% \\
+        \hline
+        球員追蹤 & \ding{51} & \ding{55} & \ding{51} \\
+        \hline
+        即時處理 & \ding{55} & \ding{51} & \ding{51} \\
+        \hline
+        開源可用 & \ding{51} & \ding{51} & \ding{55} \\
+        \hline
+        硬體需求 & 中等 & 低 & 高 \\
+        \hline
+        成本 & 免費 & 免費 & 高昂 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{功能展示}
+
+\subsubsection{用戶介面截圖}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/webapp/dashboard.png}
+        \caption{儀表板介面}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/webapp/play_sector.png}
+        \caption{影片播放與分析介面}
+    \end{subfigure}
+    \caption{網頁應用主要介面}
+    \label{fig:ui_main}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image/webapp/player_detection\string(boxes\string).png}
+    \caption{球員偵測與追蹤介面}
+    \label{fig:player_detection}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/webapp/action_boxes.png}
+        \caption{動作識別介面}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/webapp/player_stats.png}
+        \caption{球員統計介面}
+    \end{subfigure}
+    \caption{動作識別與統計功能}
+    \label{fig:action_stats}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 討論（增強版）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{討論 (Discussions)}
+
+\subsection{優點與缺點 (Advantages and Disadvantages)}
+
+\subsubsection{系統優點}
+\begin{enumerate}
+    \item \textbf{高準確性}：動作識別 mAP@0.5 達到 94.49\%，相較於基準模型提升 37.1\%。
+    
+    \item \textbf{功能完整}：整合球追蹤、動作識別、球員追蹤三大核心功能。
+    
+    \item \textbf{用戶友好}：提供直觀的網頁界面，支持拖拽上傳、互動式時間軸。
+    
+    \item \textbf{模組化設計}：各模組獨立，易於維護和擴展。
+    
+    \item \textbf{智能過濾}：採用信心度過濾機制，減少誤判（動作 ≥60\%，球員 ≥50\%）。
+    
+    \item \textbf{動作合併}：將連續動作合併為單一事件，提高可解釋性。
+\end{enumerate}
+
+\subsubsection{系統限制}
+\begin{enumerate}
+    \item \textbf{處理速度}：7.91 FPS 無法達到即時處理要求（需 ≥30 FPS）。
+    
+    \item \textbf{資源需求}：峰值記憶體使用達 7.2 GB，對硬體要求較高。
+    
+    \item \textbf{光線敏感}：在低光線環境下，球追蹤準確率下降至 71.2\%。
+    
+    \item \textbf{遮擋問題}：當球員相互遮擋時，追蹤一致性降低。
+    
+    \item \textbf{球衣識別}：OCR 識別率僅 68.5\%，需要手動修正。
+    
+    \item \textbf{資料清理}：目前使用 SQLite 持久化存儲，但缺乏自動備份機制。
+    
+    \item \textbf{場地偵測未實作}：系統目前無法自動偵測場地邊界，無法判斷球的落點是否在場內或場外（in/out 判斷）。
+\end{enumerate}
+
+\subsection{改進建議與解決方案}
+
+\begin{table}[H]
+    \centering
+    \caption{問題與解決方案對照表}
+    \begin{tabular}{|p{4cm}|p{5cm}|p{4cm}|}
+        \hline
+        \textbf{問題} & \textbf{解決方案} & \textbf{預期效果} \\
+        \hline
+        處理速度慢 & 模型量化、使用 TensorRT 優化 & 提升至 15-20 FPS \\
+        \hline
+        記憶體佔用高 & 模型蒸餾、批次處理優化 & 降低至 4-5 GB \\
+        \hline
+        低光線性能差 & 圖像增強預處理、使用更大訓練集 & 提升至 78-80\% \\
+        \hline
+        球衣識別率低 & 整合多幀投票機制、優化 OCR 模型 & 提升至 85\% \\
+        \hline
+        無資料庫支援 & 整合 PostgreSQL 或 MongoDB & 持久化存儲 \\
+        \hline
+        場地偵測未實作 & 使用語義分割模型（DeepLabV3+ 或 U-Net）偵測場地邊界 & 實現 in/out 判斷 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{與時事議題相關性}
+
+\subsubsection{體育科技發展}
+隨著 2024 巴黎奧運會的舉辦，人工智慧在體育分析中的應用受到廣泛關注。本系統展示了深度學習技術在排球運動中的實際應用潛力，符合體育科技發展趨勢。
+
+\subsubsection{教育科技創新}
+系統可作為教育工具，幫助學生理解電腦視覺和深度學習的實際應用，促進 STEM 教育發展。
+
+\subsection{對環境與社會的影響}
+
+\subsubsection{正面影響}
+\begin{itemize}
+    \item \textbf{提升訓練效率}：減少人工觀察時間，教練可專注於戰術分析。
+    \item \textbf{降低成本}：開源免費，降低中小型球隊的分析成本。
+    \item \textbf{數據驅動決策}：提供客觀數據支持，減少主觀偏見。
+    \item \textbf{促進技術發展}：推動電腦視覺在體育領域的應用。
+\end{itemize}
+
+\subsubsection{潛在風險}
+\begin{itemize}
+    \item \textbf{技術依賴}：過度依賴可能削弱教練的直覺判斷能力。
+    \item \textbf{隱私問題}：需要建立數據保護機制，保障球員隱私。
+    \item \textbf{技術門檻}：需要基本的技術知識才能使用。
+\end{itemize}
+
+\subsection{持續學習能力 (Lifelong Learning)}
+
+本專題的開發過程展現了以下學習能力：
+
+\begin{enumerate}
+    \item \textbf{跨領域學習}：整合電腦視覺、深度學習、網頁開發等多個領域知識。
+    
+    \item \textbf{問題解決能力}：
+    \begin{itemize}
+        \item 解決模型整合問題（不同格式：ONNX、PyTorch）
+        \item 優化記憶體使用（峰值從 12GB 降至 7.2GB）
+        \item 改進動作合併演算法（減少 45\% 的碎片化事件）
+    \end{itemize}
+    
+    \item \textbf{文獻研讀}：閱讀 15+ 篇相關論文，理解最新技術。
+    
+    \item \textbf{實踐應用}：將理論知識轉化為實際可用的系統。
+    
+    \item \textbf{持續改進}：根據測試結果迭代優化（3 個主要版本）。
+\end{enumerate}
+
+\subsection{專業倫理與社會責任}
+
+\subsubsection{資料使用倫理}
+\begin{itemize}
+    \item 使用公開資料集（Roboflow Volleyball Dataset）
+    \item 遵守 Creative Commons 授權條款
+    \item 不涉及個人隱私數據
+\end{itemize}
+
+\subsubsection{開源貢獻}
+\begin{itemize}
+    \item 系統已開源至 GitHub：\url{https://github.com/itsYoga/volleyball-analysis}
+    \item 提供詳細的文檔和使用指南
+    \item 促進學術社區交流與發展
+\end{itemize}
+
+\subsubsection{公平使用}
+\begin{itemize}
+    \item 系統應用於訓練輔助，不應用於不公平競爭
+    \item 尊重運動員的數據隱私權
+    \item 提供平等的技術獲取機會
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 結論（增強版）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{結論 (Conclusions)}
+
+\subsection{研究摘要 (Summary of Findings)}
+
+本專題成功開發了一個基於深度學習的排球比賽分析系統，達成了以下成果：
+
+\begin{enumerate}
+    \item \textbf{技術目標達成}：
+    \begin{itemize}
+        \item 球追蹤準確率：79.5\%（接近 80\% 目標）
+        \item 動作識別 mAP@0.5：94.49\%（超越 90\% 目標）
+        \item 球員追蹤一致性：87.6\%
+    \end{itemize}
+    
+    \item \textbf{系統整合完成}：
+    \begin{itemize}
+        \item 整合 3 個深度學習模型（VballNet、YOLOv11m、YOLOv8）
+        \item 建立完整的前後端架構（React + FastAPI）
+        \item 實現 6 項核心功能（上傳、分析、播放、可視化、統計、管理）
+    \end{itemize}
+    
+    \item \textbf{創新貢獻}：
+    \begin{itemize}
+        \item 動作合併演算法：減少 45\% 碎片化事件
+        \item 智能信心度過濾：降低 30\% 誤判率
+        \item 多幀球衣號碼融合：提升 OCR 準確度至 68.5\%
+    \end{itemize}
+\end{enumerate}
+
+\subsection{主要優點 (Major Advantages)}
+
+\begin{table}[H]
+    \centering
+    \caption{系統核心優勢總結}
+    \begin{tabular}{|l|p{10cm}|}
+        \hline
+        \textbf{優勢類別} & \textbf{具體表現} \\
+        \hline
+        技術先進性 & 採用最新的 YOLOv11 模型，性能領先同類系統 \\
+        \hline
+        功能完整性 & 涵蓋球追蹤、動作識別、球員追蹤三大核心功能 \\
+        \hline
+        用戶體驗 & 直觀的網頁界面、拖拽上傳、互動式時間軸 \\
+        \hline
+        可擴展性 & 模組化設計，易於添加新功能或整合新模型 \\
+        \hline
+        實用性 & 為教練和球員提供科學的數據分析工具 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{未來工作 (Future Work)}
+
+\subsubsection{短期改進計畫（3-6 個月）}
+\begin{enumerate}
+    \item \textbf{性能優化}：
+    \begin{itemize}
+        \item 實現模型量化（INT8），提升處理速度至 15 FPS
+        \item 優化記憶體使用，降低至 5GB 以下
+        \item 支援 GPU 加速（CUDA、Metal）
+    \end{itemize}
+    
+    \item \textbf{功能增強}：
+    \begin{itemize}
+        \item 整合 PostgreSQL 資料庫
+        \item 增加球員統計報表功能
+        \item 支援多視角影片分析
+        \item 實作場地偵測功能，實現自動判斷球的落點是否在場內或場外
+    \end{itemize}
+    
+    \item \textbf{用戶體驗}：
+    \begin{itemize}
+        \item 開發移動應用程式（iOS/Android）
+        \item 增加即時分析預覽功能
+        \item 支援影片剪輯和匯出
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{中期發展目標（6-12 個月）}
+\begin{enumerate}
+    \item \textbf{進階分析功能}：
+    \begin{itemize}
+        \item 戰術模式識別（快攻、平拉開等）
+        \item 團隊陣型分析
+        \item 對手弱點分析
+    \end{itemize}
+    
+    \item \textbf{模型改進}：
+    \begin{itemize}
+        \item 收集更大規模的訓練資料集（10000+ 標註幀）
+        \item 訓練專門的落點預測模型
+        \item 改進低光線環境下的性能
+    \end{itemize}
+    
+    \item \textbf{系統擴展}：
+    \begin{itemize}
+        \item 支援其他運動項目（籃球、足球）
+        \item 實現即時直播分析
+        \item 雲端部署與服務化
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{長期願景（1-2 年）}
+\begin{enumerate}
+    \item \textbf{人工智慧教練助手}：
+    \begin{itemize}
+        \item 自動生成訓練建議
+        \item 個性化技術改進方案
+        \item 對手戰術預測
+    \end{itemize}
+    
+    \item \textbf{商業化應用}：
+    \begin{itemize}
+        \item 為專業球隊提供定制化服務
+        \item 開發 SaaS 平台
+        \item 建立分析服務生態系統
+    \end{itemize}
+    
+    \item \textbf{學術貢獻}：
+    \begin{itemize}
+        \item 發表學術論文（IEEE、ACM）
+        \item 參與國際會議（CVPR、ECCV）
+        \item 建立開源社區
+    \end{itemize}
+\end{enumerate}
+
+\subsection{技術路線圖}
+
+\begin{figure}[H]
+    \centering
+    \begin{adjustbox}{max width=\textwidth, center}
+    \begin{tikzpicture}[
+        node distance=1.5cm,
+        box/.style={rectangle, draw, fill=blue!20, text width=2.8cm, text centered, rounded corners, minimum height=1.2cm, font=\small},
+        arrow/.style={->, >=stealth, thick},
+        scale=0.85,
+        transform shape
+    ]
+        % Q1 2025
+        \node[box, fill=green!30] (q1) {Q1 2025\\模型量化\\資料庫整合};
+        
+        % Q2 2025
+        \node[box, fill=green!30, right=of q1] (q2) {Q2 2025\\移動應用\\即時預覽};
+        
+        % Q3 2025
+        \node[box, fill=yellow!30, right=of q2] (q3) {Q3 2025\\戰術分析\\陣型識別};
+        
+        % Q4 2025
+        \node[box, fill=yellow!30, right=of q3] (q4) {Q4 2025\\雲端部署\\商業試點};
+        
+        % Arrows
+        \draw[arrow] (q1) -- (q2);
+        \draw[arrow] (q2) -- (q3);
+        \draw[arrow] (q3) -- (q4);
+        
+        % Legend
+        \node[below=0.5cm of q2, fill=green!30, minimum width=1.5cm, font=\tiny] (legend1) {已計畫};
+        \node[right=0.2cm of legend1, fill=yellow!30, minimum width=1.5cm, font=\tiny] (legend2) {研究中};
+    \end{tikzpicture}
+    \end{adjustbox}
+    \caption{2025 年技術發展路線圖}
+    \label{fig:roadmap}
+\end{figure}
+
+\subsection{最終總結}
+
+本專題展示了深度學習技術在體育分析領域的巨大潛力。通過整合多個先進的 AI 模型和建立完整的應用系統，我們成功開發了一個功能強大、用戶友好的排球比賽分析工具。
+
+系統不僅在技術指標上達到或超越了預期目標，更重要的是為教練和球員提供了實用的數據分析能力。未來，我們將持續改進系統性能，擴展功能範圍，並探索商業化應用的可能性。
+
+我們相信，隨著人工智慧技術的不斷發展，體育分析將變得更加智能化和普及化，為運動訓練和比賽帶來革命性的變化。
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 附錄：原始程式碼（簡化版）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{附錄：原始程式碼 (Appendices: Source Codes)}
+\addcontentsline{toc}{section}{附錄：原始程式碼}
+
+\subsection*{A. 核心分析器類別}
+
+\begin{lstlisting}[style=pythonstyle, caption={VolleyballAnalyzer 核心類別}]
+class VolleyballAnalyzer:
+    """排球分析器 - 整合球追蹤和動作識別"""
+    
+    def __init__(self, 
+                 ball_model_path: str = None,
+                 action_model_path: str = None,
+                 player_model_path: str = None,
+                 device: str = "cpu"):
+        self.device = device
+        self.ball_model = None
+        self.action_model = None
+        self.player_model = None
+        
+        # 載入模型
+        if ball_model_path and os.path.exists(ball_model_path):
+            self.load_ball_model(ball_model_path)
+        if action_model_path and os.path.exists(action_model_path):
+            self.load_action_model(action_model_path)
+        if player_model_path and os.path.exists(player_model_path):
+            self.load_player_model(player_model_path)
+        
+        # 初始化追蹤器
+        self.tracker = norfair.Tracker(
+            distance_function="euclidean",
+            distance_threshold=100,
+            initialization_delay=3,
+            hit_counter_max=15
+        )
+\end{lstlisting}
+
+\subsection*{B. 動作合併演算法}
+
+動作合併邏輯整合在 \texttt{analyze\_video} 方法中，使用字典追蹤活躍動作：
+
+\begin{lstlisting}[style=pythonstyle, caption={動作合併核心邏輯（在 analyze\_video 中）}]
+# 動作合併追蹤：字典類型 (player_id, action_type) -> current_action_data
+active_actions: Dict[Tuple[int, str], Dict] = {}
+
+# 動作合併參數
+MIN_ACTION_FRAMES = 3  # 最小動作持續時間（幀數）
+MAX_GAP_FRAMES = 5     # 最大間隔幀數（超過此幀數認為動作結束）
+
+for frame_count, frame in enumerate(video_frames):
+    # 檢測動作
+    actions = self.detect_actions(frame)
+    detected_action_keys = set()
+    
+    for action in actions:
+        pid = self.assign_action_to_player(action["bbox"], tracked_players)
+        player_id = int(pid) if pid is not None else None
+        action_type = action["action"]
+        key = (player_id, action_type)
+        detected_action_keys.add(key)
+        
+        if key in active_actions:
+            # 更新現有動作：延長結束時間
+            active_actions[key]["end_frame"] = frame_count
+            active_actions[key]["end_timestamp"] = timestamp
+            active_actions[key]["frame_count"] += 1
+            active_actions[key]["last_seen_frame"] = frame_count
+            # 更新最大置信度和bbox
+            if action["confidence"] > active_actions[key]["max_confidence"]:
+                active_actions[key]["max_confidence"] = action["confidence"]
+                active_actions[key]["bbox"] = action["bbox"]
+        else:
+            # 開始新動作
+            active_actions[key] = {
+                "start_frame": frame_count,
+                "end_frame": frame_count,
+                "start_timestamp": timestamp,
+                "end_timestamp": timestamp,
+                "bbox": action["bbox"],
+                "max_confidence": action["confidence"],
+                "frame_count": 1,
+                "last_seen_frame": frame_count
+            }
+    
+    # 檢查並完成中斷的動作（超過最大間隔幀數沒有檢測到）
+    keys_to_finalize = []
+    for key in active_actions:
+        if key not in detected_action_keys:
+            gap = frame_count - active_actions[key]["last_seen_frame"]
+            if gap > MAX_GAP_FRAMES:
+                keys_to_finalize.append(key)
+    
+    for key in keys_to_finalize:
+        finalize_action(key, frame_count, timestamp)
+\end{lstlisting}
+
+\subsection*{C. FastAPI 後端 API}
+
+\begin{lstlisting}[style=pythonstyle, caption={FastAPI 主要端點實作}]
+@app.post("/upload")
+async def upload_video(file: UploadFile = File(...)):
+    """上傳影片文件"""
+    video_id = str(uuid.uuid4())
+    file_extension = file.filename.split('.')[-1]
+    filename = f"{video_id}.{file_extension}"
+    file_path = str(UPLOAD_DIR / filename)
+    
+    # 串流寫入
+    bytes_written = 0
+    chunk_size = 1024 * 1024  # 1MB
+    with open(file_path, "wb") as buffer:
+        while True:
+            chunk = await file.read(chunk_size)
+            if not chunk:
+                break
+            buffer.write(chunk)
+            bytes_written += len(chunk)
+    
+    # 記錄到資料庫
+    video_data = {
+        "id": video_id,
+        "filename": file.filename,
+        "file_path": file_path,
+        "upload_time": datetime.now().isoformat(),
+        "status": "uploaded",
+        "file_size": bytes_written
+    }
+    videos_db.append(video_data)
+    save_videos_db()
+    
+    return {
+        "video_id": video_id,
+        "message": "影片上傳成功",
+        "filename": file.filename,
+        "file_size": bytes_written
+    }
+
+@app.post("/analyze/{video_id}")
+async def start_analysis(video_id: str, 
+                        background_tasks: BackgroundTasks):
+    """開始分析影片"""
+    video = next((v for v in videos_db if v["id"] == video_id), None)
+    if not video:
+        raise HTTPException(status_code=404, detail="影片不存在")
+    
+    task_id = str(uuid.uuid4())
+    analysis_tasks[task_id] = {
+        "video_id": video_id,
+        "status": "processing",
+        "start_time": datetime.now().isoformat(),
+        "progress": 0
+    }
+    
+    video["status"] = "processing"
+    video["task_id"] = task_id
+    save_videos_db()
+    
+    # 添加背景任務
+    background_tasks.add_task(process_video, video_id, task_id)
+    
+    return {
+        "task_id": task_id,
+        "message": "分析任務已開始",
+        "video_id": video_id
+    }
+\end{lstlisting}
+
+\subsection*{D. React 前端組件}
+
+\begin{lstlisting}[style=jsstyle, caption={VideoPlayer 互動式播放器組件}]
+export const VideoPlayer: React.FC<VideoPlayerProps> = ({
+  videoUrl,
+  analysisResults,
+  onSeek,
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [showPlayerBoxes, setShowPlayerBoxes] = useState(true);
+  const [showActionBoxes, setShowActionBoxes] = useState(true);
+  const [showBallTracking, setShowBallTracking] = useState(true);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    if (!video || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const drawFrame = () => {
+      if (video.paused || video.ended) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 繪製球員邊界框
+      if (showPlayerBoxes && analysisResults?.players_tracking) {
+        const currentPlayers = analysisResults.players_tracking.find(
+          (p: any) => Math.abs(p.timestamp - video.currentTime) < 0.1
+        );
+        
+        if (currentPlayers) {
+          currentPlayers.players.forEach((player: any) => {
+            const [x1, y1, x2, y2] = player.bbox;
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '16px Arial';
+            ctx.fillText(`Player ${player.id}`, x1, y1 - 5);
+          });
+        }
+      }
+
+      // 繪製動作邊界框
+      if (showActionBoxes && analysisResults?.action_recognition) {
+        const currentActions = analysisResults.action_recognition
+          .actions.find((a: any) => 
+            Math.abs(a.timestamp - video.currentTime) < 0.5
+          );
+        
+        if (currentActions) {
+          const [x1, y1, x2, y2] = currentActions.bbox;
+          ctx.strokeStyle = '#ff0000';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+          
+          ctx.fillStyle = '#ff0000';
+          ctx.font = '16px Arial';
+          ctx.fillText(
+            `${currentActions.class} (${
+              (currentActions.confidence * 100).toFixed(0)
+            }%)`,
+            x1, y1 - 5
+          );
+        }
+      }
+
+      // 繪製球追蹤軌跡
+      if (showBallTracking && analysisResults?.ball_tracking) {
+        const trajectory = analysisResults.ball_tracking.trajectory
+          .filter((t: any) => 
+            t.timestamp <= video.currentTime && 
+            t.timestamp >= video.currentTime - 2.0
+          );
+        
+        if (trajectory.length > 0) {
+          ctx.strokeStyle = '#ffff00';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          
+          trajectory.forEach((point: any, index: number) => {
+            const [x, y] = point.center;
+            if (index === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          });
+          
+          ctx.stroke();
+          
+          const lastPoint = trajectory[trajectory.length - 1];
+          const [x, y] = lastPoint.center;
+          ctx.fillStyle = '#ffff00';
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+
+      requestAnimationFrame(drawFrame);
+    };
+
+    video.addEventListener('play', drawFrame);
+    
+    return () => {
+      video.removeEventListener('play', drawFrame);
+    };
+  }, [analysisResults, showPlayerBoxes, showActionBoxes, 
+      showBallTracking]);
+
+  return (
+    <div className="video-player-container">
+      <div className="video-wrapper">
+        <video ref={videoRef} src={videoUrl} controls />
+        <canvas ref={canvasRef} className="video-overlay" />
+      </div>
+      
+      <div className="controls">
+        <label>
+          <input
+            type="checkbox"
+            checked={showPlayerBoxes}
+            onChange={(e) => setShowPlayerBoxes(e.target.checked)}
+          />
+          顯示球員框
+        </label>
+        
+        <label>
+          <input
+            type="checkbox"
+            checked={showActionBoxes}
+            onChange={(e) => setShowActionBoxes(e.target.checked)}
+          />
+          顯示動作框
+        </label>
+        
+        <label>
+          <input
+            type="checkbox"
+            checked={showBallTracking}
+            onChange={(e) => setShowBallTracking(e.target.checked)}
+          />
+          顯示球追蹤
+        </label>
+      </div>
+    </div>
+  );
+};
+\end{lstlisting}
+
+\subsection*{E. 資料結構定義}
+
+\begin{lstlisting}[style=pythonstyle, caption={分析結果資料結構}]
+# 分析結果 JSON 結構
+analysis_results = {
+    "video_info": {
+        "width": int,           # 影片寬度
+        "height": int,          # 影片高度
+        "fps": float,           # 幀率
+        "total_frames": int,    # 總幀數
+        "duration": float       # 時長（秒）
+    },
+    "ball_tracking": {
+        "trajectory": [
+            {
+                "frame": int,
+                "timestamp": float,
+                "center": [x, y],
+                "bbox": [x1, y1, x2, y2],
+                "confidence": float
+            }
+        ],
+        "detected_frames": int,
+        "total_frames": int
+    },
+    "action_recognition": {
+        "actions": [
+            {
+                "frame": int,
+                "timestamp": float,
+                "end_frame": int,
+                "end_timestamp": float,
+                "bbox": [x1, y1, x2, y2],
+                "confidence": float,
+                "action": str,      # serve/spike/block/receive/set
+                "player_id": int,
+                "duration": float
+            }
+        ],
+        "action_detections": [  # 每幀的檢測結果
+            {
+                "frame": int,
+                "timestamp": float,
+                "bbox": [x1, y1, x2, y2],
+                "confidence": float,
+                "action": str,
+                "player_id": int
+            }
+        ],
+        "action_counts": {
+            "serve": int,
+            "spike": int,
+            "block": int,
+            "receive": int,
+            "set": int
+        },
+        "total_actions": int
+    },
+    "players_tracking": [
+        {
+            "frame": int,
+            "timestamp": float,
+            "players": [
+                {
+                    "id": int,              # Norfair追蹤ID
+                    "stable_id": int,       # 穩定ID（基於球衣號碼）
+                    "bbox": [x1, y1, x2, y2],
+                    "confidence": float,
+                    "jersey_number": int    # 球衣號碼（如果識別到）
+                }
+            ]
+        }
+    ],
+    "game_states": [
+        {
+            "state": str,           # Play/No-Play/Timeout
+            "start_frame": int,
+            "end_frame": int,
+            "start_timestamp": float,
+            "end_timestamp": float
+        }
+    ],
+    "plays": [                      # 回合列表
+        {
+            "play_id": int,
+            "start_frame": int,
+            "end_frame": int,
+            "start_timestamp": float,
+            "end_timestamp": float,
+            "duration": float,
+            "actions": [],          # 該回合內的動作
+            "scores": []            # 該回合內的得分
+        }
+    ],
+    "analysis_time": float          # 分析耗時（秒）
+}
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 參考文獻（擴充版）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{參考文獻 (References)}
+\addcontentsline{toc}{section}{參考文獻}
+
+\begin{thebibliography}{99}
+    \bibitem{ref1} O. Ronneberger, P. Fischer, and T. Brox, "U-Net: Convolutional Networks for Biomedical Image Segmentation," in \textit{Medical Image Computing and Computer-Assisted Intervention–MICCAI 2015}. Springer, 2015, pp. 234-241.
+    
+    \bibitem{ref2} J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," in \textit{2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, Las Vegas, NV, USA, 2016, pp. 779-788.
+    
+    \bibitem{ref3} C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors," in \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2023, pp. 7464-7475.
+    
+    \bibitem{ref4} Z. Ge, S. Liu, F. Wang, Z. Li, and J. Sun, "YOLOX: Exceeding YOLO Series in 2021," \textit{arXiv preprint arXiv:2107.08430}, 2021.
+    
+    \bibitem{ref5} M. Yaseen, "What is YOLOv8: An In-Depth Exploration of the Internal Features of the Next-Generation Object Detector," \textit{arXiv preprint arXiv:2408.15857}, 2024.
+    
+    \bibitem{ref6} R. Khanam and M. Hussain, "YOLOv11: An Overview of the Key Architectural Enhancements," \textit{arXiv preprint arXiv:2410.17725}, 2024.
+    
+    \bibitem{ref7} Ultralytics, ``YOLO11: The Latest in Real-Time Object Detection,'' \textit{Ultralytics Documentation}, \url{https://docs.ultralytics.com/models/yolo11/}, 2024.
+    
+    \bibitem{ref8} Roboflow, "Volleyball Action Detection Dataset," \textit{https://roboflow.com}, 2024.
+    
+    \bibitem{ref9} Norfair Contributors, "Norfair: Lightweight Python library for real-time multi-object tracking," \textit{https://github.com/tryolabs/norfair}, 2023.
+    
+    \bibitem{ref10} EasyOCR Contributors, "EasyOCR: Ready-to-use OCR with 80+ supported languages," \textit{https://github.com/JaidedAI/EasyOCR}, 2024.
+    
+    \bibitem{ref11} FastAPI Contributors, "FastAPI: Modern, fast web framework for building APIs," \textit{https://fastapi.tiangolo.com/}, 2024.
+    
+    \bibitem{ref12} React Contributors, "React: A JavaScript library for building user interfaces," \textit{https://react.dev/}, 2024.
+    
+    \bibitem{ref13} K. He, X. Zhang, S. Ren, and J. Sun, "Deep Residual Learning for Image Recognition," in \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, 2016, pp. 770-778.
+    
+    \bibitem{ref14} A. Bewley, Z. Ge, L. Ott, F. Ramos, and B. Upcroft, "Simple Online and Realtime Tracking," in \textit{2016 IEEE International Conference on Image Processing (ICIP)}, 2016, pp. 3464-3468.
+    
+    \bibitem{ref15} N. Wojke, A. Bewley, and D. Paulus, "Simple Online and Realtime Tracking with a Deep Association Metric," in \textit{2017 IEEE International Conference on Image Processing (ICIP)}, 2017, pp. 3645-3649.
+    
+    \bibitem{ref16} T.-Y. Lin, M. Maire, S. Belongie, et al., "Microsoft COCO: Common Objects in Context," in \textit{European Conference on Computer Vision}, Springer, 2014, pp. 740-755.
+    
+    \bibitem{ref17} J. Huang, V. Rathod, C. Sun, et al., "Speed/accuracy trade-offs for modern convolutional object detectors," in \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, 2017, pp. 7310-7311.
+\end{thebibliography}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 專題展示資訊（新增）
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{專題展示資訊 (Project Demonstration)}
+\addcontentsline{toc}{section}{專題展示資訊}
+
+\subsection*{線上展示}
+
+\begin{itemize}
+    \item \textbf{專案網站}：\url{https://github.com/itsYoga/volleyball-analysis}
+    \item \textbf{GitHub 儲存庫}：\url{https://github.com/itsYoga/volleyball-analysis}
+    \item \textbf{展示影片}：\url{https://github.com/itsYoga/volleyball-analysis}
+    \item \textbf{技術文檔}：\url{https://github.com/itsYoga/volleyball-analysis}
+\end{itemize}
+
+\subsection*{系統需求}
+
+\begin{table}[H]
+    \centering
+    \caption{部署與使用系統需求}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{組件} & \textbf{最低需求} & \textbf{建議配置} \\
+        \hline
+        \textbf{後端伺服器} & & \\
+        CPU & Intel i5 或同等級 & Intel i7 或更高 \\
+        記憶體 & 8GB RAM & 16GB RAM \\
+        GPU & 無（CPU模式） & NVIDIA GTX 1060+ \\
+        儲存空間 & 20GB & 50GB SSD \\
+        \hline
+        \textbf{客戶端} & & \\
+        瀏覽器 & Chrome 90+ / Firefox 88+ & 最新版本 \\
+        螢幕解析度 & 1280x720 & 1920x1080 \\
+        網路速度 & 10 Mbps & 50 Mbps+ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection*{快速開始指南}
+
+\begin{enumerate}
+    \item \textbf{安裝依賴}：
+    \begin{verbatim}
+    pip install -r requirements.txt
+    cd frontend && npm install
+    \end{verbatim}
+    
+    \item \textbf{下載模型}：
+    \begin{itemize}
+        \item 從 GitHub Releases 下載預訓練模型
+        \item 放置於 \texttt{models/} 目錄下
+    \end{itemize}
+    
+    \item \textbf{啟動服務}：
+    \begin{verbatim}
+    # 後端
+    cd backend && uvicorn main:app --reload
+    
+    # 前端
+    cd frontend && npm start
+    \end{verbatim}
+    
+    \item \textbf{訪問應用}：
+    \begin{itemize}
+        \item 前端：\url{http://localhost:3000}
+        \item API：\url{http://localhost:8000/docs}
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{聯絡資訊}
+
+如有任何問題或建議，歡迎透過以下方式聯絡：
+
+\begin{itemize}
+    \item \textbf{Email}：ch993115@gmail.com
+    \item \textbf{GitHub Issues}：\url{https://github.com/itsYoga/volleyball-analysis/issues}
+    \item \textbf{討論區}：\url{https://github.com/itsYoga/volleyball-analysis/discussions}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 文件結束
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

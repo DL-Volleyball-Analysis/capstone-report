@@ -1,0 +1,19 @@
+\contentsline {figure}{\numberline {1}{\ignorespaces 系統整體架構圖（虛線框表示未實作功能）}}{9}{figure.caption.2}%
+\contentsline {figure}{\numberline {2}{\ignorespaces U-Net 架構示意圖}}{11}{figure.caption.3}%
+\contentsline {figure}{\numberline {3}{\ignorespaces AI核心處理流程圖}}{13}{figure.caption.5}%
+\contentsline {figure}{\numberline {4}{\ignorespaces 排球落點判斷流程}}{13}{figure.caption.6}%
+\contentsline {figure}{\numberline {5}{\ignorespaces YOLOv11 架構示意圖}}{14}{figure.caption.8}%
+\contentsline {figure}{\numberline {6}{\ignorespaces YOLOv11 動作識別結果（一）}}{16}{figure.caption.10}%
+\contentsline {figure}{\numberline {7}{\ignorespaces YOLOv11 動作識別結果（二）}}{16}{figure.caption.11}%
+\contentsline {figure}{\numberline {8}{\ignorespaces YOLOv8 Anchor-free 檢測機制示意圖}}{17}{figure.caption.12}%
+\contentsline {figure}{\numberline {9}{\ignorespaces C2f 模組結構示意圖}}{17}{figure.caption.13}%
+\contentsline {figure}{\numberline {10}{\ignorespaces C3 與 C2f 模組結構對比}}{18}{figure.caption.14}%
+\contentsline {figure}{\numberline {11}{\ignorespaces 前後端分離系統架構圖}}{23}{figure.caption.20}%
+\contentsline {figure}{\numberline {12}{\ignorespaces 系統整體架構圖（詳細版）}}{23}{figure.caption.21}%
+\contentsline {figure}{\numberline {13}{\ignorespaces 後端架構圖}}{25}{figure.caption.23}%
+\contentsline {figure}{\numberline {14}{\ignorespaces pytest 測試覆蓋率報告}}{30}{figure.caption.28}%
+\contentsline {figure}{\numberline {15}{\ignorespaces 網頁應用主要介面}}{36}{figure.caption.39}%
+\contentsline {figure}{\numberline {16}{\ignorespaces 球員偵測與追蹤介面}}{36}{figure.caption.40}%
+\contentsline {figure}{\numberline {17}{\ignorespaces 動作識別與統計功能}}{36}{figure.caption.41}%
+\contentsline {figure}{\numberline {18}{\ignorespaces 2025 年技術發展路線圖}}{42}{figure.caption.44}%
+\contentsfinish 

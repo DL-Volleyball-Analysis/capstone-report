@@ -1,0 +1,28 @@
+\contentsline {table}{\numberline {1}{\ignorespaces 專題分工及貢獻度}}{1}{table.caption.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces VballNet 模型技術規格}}{12}{table.caption.4}%
+\contentsline {table}{\numberline {3}{\ignorespaces YOLO 系列模型演進}}{14}{table.caption.7}%
+\contentsline {table}{\numberline {4}{\ignorespaces YOLOv11m 動作識別模型規格}}{15}{table.caption.9}%
+\contentsline {table}{\numberline {5}{\ignorespaces Norfair 追蹤器參數詳解}}{19}{table.caption.15}%
+\contentsline {table}{\numberline {6}{\ignorespaces 系統模組概覽}}{21}{table.caption.16}%
+\contentsline {table}{\numberline {7}{\ignorespaces 排球追蹤模組參數}}{21}{table.caption.17}%
+\contentsline {table}{\numberline {8}{\ignorespaces 動作識別類別}}{22}{table.caption.18}%
+\contentsline {table}{\numberline {9}{\ignorespaces Norfair 追蹤器參數}}{22}{table.caption.19}%
+\contentsline {table}{\numberline {10}{\ignorespaces FastAPI 框架優勢}}{24}{table.caption.22}%
+\contentsline {table}{\numberline {11}{\ignorespaces 主要 API 端點}}{25}{table.caption.24}%
+\contentsline {table}{\numberline {12}{\ignorespaces 前端技術棧}}{26}{table.caption.25}%
+\contentsline {table}{\numberline {13}{\ignorespaces 主要 React 元件}}{27}{table.caption.26}%
+\contentsline {table}{\numberline {14}{\ignorespaces 測試層次與覆蓋率}}{30}{table.caption.27}%
+\contentsline {table}{\numberline {15}{\ignorespaces 實驗環境規格}}{33}{table.caption.29}%
+\contentsline {table}{\numberline {16}{\ignorespaces 排球追蹤性能詳細指標}}{33}{table.caption.30}%
+\contentsline {table}{\numberline {17}{\ignorespaces 不同場景下的追蹤準確率}}{33}{table.caption.31}%
+\contentsline {table}{\numberline {18}{\ignorespaces 動作識別整體性能}}{34}{table.caption.32}%
+\contentsline {table}{\numberline {19}{\ignorespaces 各動作類別的識別性能}}{34}{table.caption.33}%
+\contentsline {table}{\numberline {20}{\ignorespaces 動作識別混淆矩陣（百分比）}}{34}{table.caption.34}%
+\contentsline {table}{\numberline {21}{\ignorespaces 球員追蹤性能指標}}{34}{table.caption.35}%
+\contentsline {table}{\numberline {22}{\ignorespaces 完整影片分析性能（5分鐘影片）}}{35}{table.caption.36}%
+\contentsline {table}{\numberline {23}{\ignorespaces 系統記憶體使用情況}}{35}{table.caption.37}%
+\contentsline {table}{\numberline {24}{\ignorespaces 本系統與其他排球分析系統比較}}{35}{table.caption.38}%
+\contentsline {table}{\numberline {25}{\ignorespaces 問題與解決方案對照表}}{37}{table.caption.42}%
+\contentsline {table}{\numberline {26}{\ignorespaces 系統核心優勢總結}}{40}{table.caption.43}%
+\contentsline {table}{\numberline {27}{\ignorespaces 部署與使用系統需求}}{52}{table.caption.45}%
+\contentsfinish 

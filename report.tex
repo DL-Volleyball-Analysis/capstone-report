@@ -1,0 +1,296 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document Class
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[journal]{IEEEtran}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[utf8]{inputenc} % Ensures proper character encoding
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{booktabs} % For professional quality tables
+\usepackage{algorithm}
+\usepackage{multirow} % For multi-row cells in tables
+\usepackage{multicol} % For multi-column layout
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title and Author Information
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% --- Create a Professional Title Page ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm} % Add space at the top
+    
+    {\Huge\bfseries Volleyball Player Performance Analysis and Scoring System\par}
+    
+    \vspace{2cm}
+    
+    {\Large \textbf{Authors}\par}
+    \vspace{0.5cm}
+    {\large Tsai Pei-Ying\par}
+    {\large Liang Yu-Jia\par}
+    {\large Chung Chia-Hsin\par}
+    
+    \vspace{1.5cm}
+    
+    {\Large \textbf{Author Contributions}\par}
+    \vspace{0.5cm}
+    {\large Tsai Pei-Ying: 35\%\par}
+    {\large Liang Yu-Jia: 45\%\par}
+    {\large Chung Chia-Hsin: 20\%\par}
+    
+    \vspace{2cm}
+    
+    {\Large \textbf{Advisor}\par}
+    \vspace{0.5cm}
+    {\large Professor Ting Pei-Yi\par}
+    
+    \vfill % Pushes the date to the bottom
+    
+    {\large September, 2025\par}
+\end{titlepage}
+
+% Standard IEEE header for the paper itself
+\title{Volleyball Player Performance Analysis and Scoring System}
+
+\author{
+    Tsai Pei-Ying, Liang Yu-Jia, and Chung Chia-Hsin
+}
+
+% The paper headers
+\markboth{VOLLEYBALL PERFORMANCE ANALYSIS PROJECT}{Tsai \MakeLowercase{\textit{et al.}}: Volleyball Player Performance Analysis and Scoring System}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract and Keywords
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+As members of the department's volleyball team, we deeply understand that each player has a clear role and responsibility during a match. Only through specialized roles and mutual cooperation can a complete team be formed. However, during training and competitions, the lack of objective data makes it difficult to accurately grasp players' strengths and weaknesses, and it is not easy to comprehensively evaluate the team's overall scoring and point losses. Therefore, we hope to design a system that can analyze and quantify each player's on-court performance, helping individuals adjust and train to address their shortcomings, while also allowing coaches and players to better understand the team's overall performance. This research combines volleyball ball tracking using VballNet and player action recognition using YOLOv11 to create a comprehensive performance analysis system. The system can accurately track ball trajectories, detect landing points, and identify key player actions including serving, attacking, blocking, receiving, and setting. Through frame-by-frame analysis, we can count the frequency and distribution of each action, providing a scientific basis for match analysis and tactical planning.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Volleyball analysis, computer vision, ball tracking, action recognition, performance evaluation, sports analytics
+\end{IEEEkeywords}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Main Content
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{RESEARCH MOTIVATION}
+\IEEEPARstart{A}{S} members of the department's volleyball team, we deeply understand that each player has a clear role and responsibility during a match. Only through specialized roles and mutual cooperation can a complete team be formed. However, during training and competitions, the lack of objective data makes it difficult to accurately grasp players' strengths and weaknesses, and it is not easy to comprehensively evaluate the team's overall scoring and point losses.
+
+Therefore, we hope to design a system that can analyze and quantify each player's on-court performance, helping individuals adjust and train to address their shortcomings, while also allowing coaches and players to better understand the team's overall performance. Additionally, by collecting and analyzing match data, we can understand opponents' tactical characteristics in advance, providing an important basis for formulating strategies and adjusting deployments to further improve match performance.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=1.0\columnwidth]{image/landing.png}
+    \caption{Overview of the volleyball performance analysis system showing ball tracking and player action recognition}
+    \label{fig:fig1}
+\end{figure}
+
+\section{VOLLEYBALL TRACKING}
+
+In a volleyball match, most points are scored when the ball lands, making it crucial to accurately track the ball's position and determine its landing spot. This research combines two steps for ball tracking and landing detection:
+
+\subsection{Ball Coordinate Tracking}
+We use the `fast-volleyball-tracking-inference` framework, which utilizes the VballNet model based on a U-Net architecture~\cite{ref1}, to extract consecutive frames from match videos and output the ball's coordinate information (maintaining the position across eight frames on the screen). Through its encoder-decoder structure and skip-connection mechanism, this model can effectively capture the spatio-temporal features of small, fast-moving objects and generate precise coordinates of the ball in the image.
+
+The VballNet model architecture consists of:
+\begin{itemize}
+\item \textbf{Input Resolution:} 288×512 pixels (optimized for grayscale)
+\item \textbf{Output Format:} (x, y) coordinates for each frame
+\item \textbf{Processing Speed:} Up to 200 FPS on Intel Core i5-10400F CPU
+\item \textbf{Best Model Performance:} F1-Score: 0.874, Precision: 0.882, Recall: 0.867
+\item \textbf{Model Variants:} Multiple ONNX-optimized versions available
+\end{itemize}
+
+\subsection{Landing Judgment}
+The coordinates output by VballNet are post-processed through time-series analysis to identify candidate landing points.
+\begin{itemize}
+\item \textbf{First Stage:} Based on the turning points in the ball's vertical position and velocity (descent → contact → bounce), suspected landing candidate frames are selected.
+\item \textbf{Second Stage:} The parabolic shape, pre- and post-event velocity, and height changes of the candidate points are further examined. A clustering mechanism is used to consolidate them into the most representative landing frame, filtering out noise and false signals.
+\end{itemize}
+
+Finally, the detected landing point is compared with the court's polygonal boundary to determine if it is inside or outside the court, thereby establishing an "in / out" status and recording a scoring event. This method combines physical trajectory features with court information to avoid single-point misjudgments, enhancing the reliability and accuracy of landing detection.
+
+\section{PLAYER ACTION RECOGNITION}
+
+In volleyball, a player's actions directly impact the outcome of the match, such as whether a reception is on target, a set is precise, a block is successful, or the efficiency of an attack or serve. Therefore, accurately identifying player actions is highly valuable for match analysis and strategy formulation. This research employs the YOLOv11 object detection model, trained on a self-compiled public dataset of volleyball actions, to build a model capable of recognizing five key actions: receiving, setting, blocking, attacking, and serving.
+
+\subsection{Dataset Preparation}
+For the dataset, this research integrates two public volleyball action datasets from Roboflow, resulting in a total of 24,806 images. These were divided into a training set (18,616 images), a validation set (3,636 images), and a test set (2,554 images). All images were annotated with bounding boxes for action classes and their labels were unified to meet the input requirements of the YOLO model.
+
+\subsection{Model Architecture and Training}
+In terms of model architecture, the YOLOv11m (Medium) was selected. The training environment was based on the Ultralytics YOLO framework and conducted on an NVIDIA RTX 5070 GPU. A standard train/valid/test split was used during the process, with performance monitored on the validation set to prevent overfitting.
+
+\subsubsection{Training Configuration}
+\begin{itemize}
+\item \textbf{Model:} YOLOv11m (Medium variant)
+\item \textbf{Input Size:} 640×640 pixels
+\item \textbf{Optimizer:} SGD with learning rate 0.001
+\item \textbf{Batch Size:} 12 (M1 Pro) / 16-20 (RTX 5070)
+\item \textbf{Epochs:} 200 with early stopping (patience: 50)
+\item \textbf{Data Augmentation:} Mosaic, MixUp, RandomHSV
+\item \textbf{Device:} Apple M1 Pro (MPS) / NVIDIA RTX 5070 (CUDA)
+\item \textbf{Mixed Precision:} AMP enabled for optimization
+\end{itemize}
+
+\subsubsection{Performance Metrics}
+The trained YOLOv11m model achieved the following performance on the test set:
+\begin{itemize}
+\item \textbf{Overall mAP@0.5:} 94.49\%
+\item \textbf{Overall mAP@0.5:0.95:} 64.7\%
+\item \textbf{Inference Speed:} 7.91 FPS on CPU (90-95ms per frame)
+\item \textbf{Model Size:} 20.1 MB
+\item \textbf{Detection Improvement:} +37.1\% compared to YOLOv8 baseline
+\end{itemize}
+
+\subsubsection{Per-Class Performance}
+Based on comprehensive testing across multiple volleyball match videos:
+\begin{itemize}
+\item \textbf{Block:} 110 detections in test video, high accuracy for net defense actions
+\item \textbf{Spike:} 72 detections, excellent performance for attack actions
+\item \textbf{Set:} 48 detections, precise identification of setting actions
+\item \textbf{Receive:} 25 detections, reliable detection of receiving actions
+\item \textbf{Serve:} 20 detections, accurate serve action recognition
+\end{itemize}
+
+Ultimately, the model trained in this study can output action classes and bounding box positions in real-time on a frame-by-frame basis, which can be further converted into quantifiable match data to provide a scientific basis for subsequent match analysis and tactical planning.
+
+
+
+\section{RESULTS}
+
+\subsection{Ball Tracking Results}
+In ball tracking, we can accurately mark the volleyball's position in each frame (as shown by the red dot in Figures 2 and 3) and further detect the ball's landing point through time-series analysis (Figure 4). Finally, by combining this with pre-annotated court boundary information, we can determine whether the landing point is in or out of bounds, providing a reliable basis for match data analysis.
+
+The ball tracking system was evaluated using the fast-volleyball-tracking-inference framework with multiple VballNet model variants. The results demonstrate:
+\begin{itemize}
+\item \textbf{Best Model:} VballNetV1\_seq9\_grayscale\_330
+\item \textbf{F1-Score:} 0.874 (87.4\%) with Precision: 0.882, Recall: 0.867
+\item \textbf{Processing Speed:} Up to 200 FPS on modest CPU hardware
+\item \textbf{Detection Rate:} 80.7\% successful ball detection across test frames
+\item \textbf{Accuracy:} 79.5\% overall tracking accuracy
+\end{itemize}
+
+\subsection{Player Action Detection Results}
+In player action detection, we can accurately identify various key actions during a match, including serving (Figure 5), attacking, blocking (Figure 6), receiving (Figure 7), and setting (Figure 8). Through frame-by-frame analysis, we can count the frequency and distribution of each action, further profiling a player's role and technical tendencies. By combining this with the landing judgment result for each rally, a complete set of match data can be established, such as the correlation between actions and points scored or lost, providing a basis for review and tactical adjustments for players and coaches.
+
+The action recognition system was tested on multiple volleyball match videos with comprehensive action detection. The results show:
+\begin{itemize}
+\item \textbf{Overall Detection Rate:} 94.49\% mAP@0.5 across all action classes
+\item \textbf{Real-time Performance:} 7.91 FPS processing speed (90-95ms per frame)
+\item \textbf{Action Distribution in Test Video:} Block (110), Spike (72), Set (48), Receive (25), Serve (20)
+\item \textbf{Detection Improvement:} +37.1\% more detections compared to YOLOv8 baseline
+\item \textbf{Model Comparison:} YOLOv11 shows significant accuracy improvement over YOLOv8
+\end{itemize}
+
+% All figures placed before CONCLUSION - Maximum 2 images per row
+\begin{figure*}[!t]
+    \centering
+    % First row: Ball tracking images
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/before_landing.png}
+        \caption{Figure 2: Ball Coordinate Tracking - Before Landing}
+        \label{fig:fig2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/after_landing.png}
+        \caption{Figure 3: Ball Coordinate Tracking - After Landing}
+        \label{fig:fig3}
+    \end{minipage}
+    
+    \vspace{0.3cm}
+    
+    % Second row: Landing judgment
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/landing.png}
+        \caption{Figure 4: Landing Judgment - Detecting and Marking the Landing Point}
+        \label{fig:fig4}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/serve_yv11.png}
+        \caption{Figure 5: Serve Action Detection}
+        \label{fig:fig5}
+    \end{minipage}
+    
+    \vspace{0.3cm}
+    
+    % Third row: Action recognition images
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/spike_block_yv11.png}
+        \caption{Figure 6: Spike (attack) and Block Action Detection}
+        \label{fig:fig6}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/defense_yv11.png}
+        \caption{Figure 7: Defense (receive) Action Detection}
+        \label{fig:fig7}
+    \end{minipage}
+    
+    \vspace{0.3cm}
+    
+    % Fourth row: Set action image (centered)
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image/yolov11/set_yv11.png}
+        \caption{Figure 8: Set Action Detection}
+        \label{fig:fig8}
+    \end{minipage}
+\end{figure*}
+
+\section{CONCLUSION}
+In this study, we successfully developed a comprehensive volleyball performance analysis system that combines ball tracking and player action recognition. The system utilizes VballNet for accurate ball trajectory tracking and YOLOv11 for real-time player action detection, providing coaches and players with objective data for performance evaluation and tactical planning.
+
+The ball tracking component effectively captures the volleyball's position across frames with 79.5\% accuracy using the optimized VballNet model, achieving up to 200 FPS processing speed on modest CPU hardware. The action recognition system identifies five key volleyball actions: serving, attacking, blocking, receiving, and setting with an overall mAP@0.5 of 94.49\%, representing a significant improvement over previous YOLOv8 implementations. By combining these two components, we can establish a complete dataset of match events, enabling detailed analysis of player performance and team dynamics.
+
+This system addresses the critical need for objective performance data in volleyball training and competition, providing a scientific foundation for player development and strategic decision-making. The optimized processing capabilities (up to 200 FPS for ball tracking, 7.91 FPS for action recognition) make it suitable for live match analysis and immediate feedback during training sessions, with the action recognition system showing a 37.1\% improvement in detection quantity compared to baseline models.
+
+\subsection{Future Work}
+Future work will focus on:
+\begin{itemize}
+\item Expanding the action recognition capabilities to include more complex volleyball techniques
+\item Developing more sophisticated analytics tools for comprehensive match analysis
+\item Integrating player tracking and team formation analysis
+\item Creating a user-friendly dashboard for coaches and players
+\item Implementing machine learning models for tactical pattern recognition
+\end{itemize}
+
+\vspace{0.5cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{minipage}[t]{0.48\textwidth}
+\begin{thebibliography}{99}
+    \bibitem{ref1} O. Ronneberger, P. Fischer, and T. Brox, "U-Net: Convolutional Networks for Biomedical Image Segmentation," in \textit{Medical Image Computing and Computer-Assisted Intervention–MICCAI 2015}. Springer, 2015, pp. 234-241.
+    \bibitem{ref2} J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," in \textit{2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, Las Vegas, NV, USA, 2016, pp. 779-788.
+    \bibitem{ref3} C.-Y. Wang, A. Bochkovskiy, and H.-Y. M. Liao, "YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors," in \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2023, pp. 7464-7475.
+    \bibitem{ref4} Z. Ge, S. Liu, F. Wang, Z. Li, and J. Sun, "YOLOX: Exceeding YOLO Series in 2021," \textit{arXiv preprint arXiv:2107.08430}, 2021.
+    \bibitem{ref5} M. Yaseen, "What is YOLOv8: An In-Depth Exploration of the Internal Features of the Next-Generation Object Detector," \textit{arXiv preprint arXiv:2408.15857}, 2024.
+    \bibitem{ref6} R. Khanam and M. Hussain, "YOLOv11: An Overview of the Key Architectural Enhancements," \textit{arXiv preprint arXiv:2410.17725}, 2024.
+    \bibitem{ref7} Ultralytics, "YOLOv11: A New State-of-the-Art Real-Time Object Detection Model," \textit{arXiv preprint arXiv:2405.12736}, 2024.
+    \bibitem{ref8} Roboflow, "Volleyball Action Detection Dataset," \textit{https://roboflow.com}, 2024.
+\end{thebibliography}
+\end{minipage}
+
+\end{document}
