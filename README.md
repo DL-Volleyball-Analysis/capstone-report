@@ -46,11 +46,18 @@ xelatex report_zh.tex  # Run twice for TOC
 
 ## Key Results | 主要成果
 
-| Module | Performance |
-|--------|-------------|
-| Ball Tracking | 79.5% accuracy |
-| Action Recognition | 94.49% mAP@0.5 |
-| Player Tracking | 87.6% consistency |
+| Module | Result | Evidence |
+|--------|--------|----------|
+| Action Recognition (YOLOv11m) | mAP@0.5 0.945, mAP@0.5:0.95 0.755 | validation split, training log |
+| Ball Tracking (VballNet) | not measured against labels | — |
+| Player Tracking (YOLOv8 + Norfair) | not measured against labels | — |
+
+**Revision (October 2026):** numbers without a measurement record were removed from both reports
+(scene-wise ball accuracy, player-tracking consistency, jersey OCR rate, comparisons with YOLOv8,
+TrackNet and commercial systems, timing and memory figures), and the action-recognition figures were
+corrected to the training log. The graded version is kept under the
+[`capstone-final`](https://github.com/DL-Volleyball-Analysis/capstone-report/tree/capstone-final) tag.
+Ongoing work: [volleyball-analysis](https://github.com/DL-Volleyball-Analysis/volleyball-analysis).
 
 ## Requirements | 需求
 

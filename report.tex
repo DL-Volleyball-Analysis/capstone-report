@@ -74,7 +74,7 @@
 % Abstract and Keywords
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-As members of the department's volleyball team, we deeply understand that each player has a clear role and responsibility during a match. Only through specialized roles and mutual cooperation can a complete team be formed. However, during training and competitions, the lack of objective data makes it difficult to accurately grasp players' strengths and weaknesses, and it is not easy to comprehensively evaluate the team's overall scoring and point losses. Therefore, we hope to design a system that can analyze and quantify each player's on-court performance, helping individuals adjust and train to address their shortcomings, while also allowing coaches and players to better understand the team's overall performance. This research combines volleyball ball tracking using VballNet and player action recognition using YOLOv11 to create a comprehensive performance analysis system. The system can accurately track ball trajectories, detect landing points, and identify key player actions including serving, attacking, blocking, receiving, and setting. Through frame-by-frame analysis, we can count the frequency and distribution of each action, providing a scientific basis for match analysis and tactical planning.
+As members of the department's volleyball team, we deeply understand that each player has a clear role and responsibility during a match. Only through specialized roles and mutual cooperation can a complete team be formed. However, during training and competitions, the lack of objective data makes it difficult to accurately grasp players' strengths and weaknesses, and it is not easy to comprehensively evaluate the team's overall scoring and point losses. Therefore, we hope to design a system that can analyze and quantify each player's on-court performance, helping individuals adjust and train to address their shortcomings, while also allowing coaches and players to better understand the team's overall performance. This research combines volleyball ball tracking using VballNet and player action recognition using YOLOv11 to create a comprehensive performance analysis system. The system tracks ball trajectories, detects landing points, and identifies key player actions including serving, attacking, blocking, receiving, and setting. Through frame-by-frame analysis, we can count the frequency and distribution of each action, providing a scientific basis for match analysis and tactical planning.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -109,8 +109,7 @@ The VballNet model architecture consists of:
 \begin{itemize}
 \item \textbf{Input Resolution:} 288×512 pixels (optimized for grayscale)
 \item \textbf{Output Format:} (x, y) coordinates for each frame
-\item \textbf{Processing Speed:} Up to 200 FPS on Intel Core i5-10400F CPU
-\item \textbf{Best Model Performance:} F1-Score: 0.874, Precision: 0.882, Recall: 0.867
+\item \textbf{Published benchmark:} see the upstream fast-volleyball-tracking-inference project (not measured in this work)
 \item \textbf{Model Variants:} Multiple ONNX-optimized versions available
 \end{itemize}
 
@@ -146,54 +145,32 @@ In terms of model architecture, the YOLOv11m (Medium) was selected. The training
 \end{itemize}
 
 \subsubsection{Performance Metrics}
-The trained YOLOv11m model achieved the following performance on the test set:
-\begin{itemize}
-\item \textbf{Overall mAP@0.5:} 94.49\%
-\item \textbf{Overall mAP@0.5:0.95:} 64.7\%
-\item \textbf{Inference Speed:} 7.91 FPS on CPU (90-95ms per frame)
-\item \textbf{Model Size:} 20.1 MB
-\item \textbf{Detection Improvement:} +37.1\% compared to YOLOv8 baseline
-\end{itemize}
+The final YOLOv11m model (epoch 190; see Results) reached mAP@0.5 of 0.945 and mAP@0.5:0.95 of 0.755 on the validation split, according to its training log.
 
 \subsubsection{Per-Class Performance}
-Based on comprehensive testing across multiple volleyball match videos:
-\begin{itemize}
-\item \textbf{Block:} 110 detections in test video, high accuracy for net defense actions
-\item \textbf{Spike:} 72 detections, excellent performance for attack actions
-\item \textbf{Set:} 48 detections, precise identification of setting actions
-\item \textbf{Receive:} 25 detections, reliable detection of receiving actions
-\item \textbf{Serve:} 20 detections, accurate serve action recognition
-\end{itemize}
+On one test video the model produced 110 block, 72 spike, 48 set, 25 receive and 20 serve detections. These are counts of detections, not accuracy: per-class precision and recall were not measured.
 
-Ultimately, the model trained in this study can output action classes and bounding box positions in real-time on a frame-by-frame basis, which can be further converted into quantifiable match data to provide a scientific basis for subsequent match analysis and tactical planning.
+Ultimately, the model trained in this study can output action classes and bounding box positions frame by frame, which can be further converted into quantifiable match data to provide a scientific basis for subsequent match analysis and tactical planning.
 
 
 
 \section{RESULTS}
 
 \subsection{Ball Tracking Results}
-In ball tracking, we can accurately mark the volleyball's position in each frame (as shown by the red dot in Figures 2 and 3) and further detect the ball's landing point through time-series analysis (Figure 4). Finally, by combining this with pre-annotated court boundary information, we can determine whether the landing point is in or out of bounds, providing a reliable basis for match data analysis.
+In ball tracking, the system marks the volleyball's position in each frame (as shown by the red dot in Figures 2 and 3) and further detect the ball's landing point through time-series analysis (Figure 4). Finally, by combining this with pre-annotated court boundary information, we can determine whether the landing point is in or out of bounds, providing a basis for match data analysis.
 
-The ball tracking system was evaluated using the fast-volleyball-tracking-inference framework with multiple VballNet model variants. The results demonstrate:
-\begin{itemize}
-\item \textbf{Best Model:} VballNetV1\_seq9\_grayscale\_330
-\item \textbf{F1-Score:} 0.874 (87.4\%) with Precision: 0.882, Recall: 0.867
-\item \textbf{Processing Speed:} Up to 200 FPS on modest CPU hardware
-\item \textbf{Detection Rate:} 80.7\% successful ball detection across test frames
-\item \textbf{Accuracy:} 79.5\% overall tracking accuracy
-\end{itemize}
+\textbf{Revision note (October 2026):} the ball tracking accuracy was not measured against labelled frames in this project, and numbers without a record have been removed from this report (the original version is kept under the \texttt{capstone-final} tag). A later comparison on five broadcast clips (1,398 frames, label-free proxies) found 8.37 false jumps per 100 frames and a 62.1\% detection rate for the FastV1 model used here, against 3.08 and 68.7\% for VballNet V4c.
 
 \subsection{Player Action Detection Results}
-In player action detection, we can accurately identify various key actions during a match, including serving (Figure 5), attacking, blocking (Figure 6), receiving (Figure 7), and setting (Figure 8). Through frame-by-frame analysis, we can count the frequency and distribution of each action, further profiling a player's role and technical tendencies. By combining this with the landing judgment result for each rally, a complete set of match data can be established, such as the correlation between actions and points scored or lost, providing a basis for review and tactical adjustments for players and coaches.
+In player action detection, the system identifies key actions during a match, including serving (Figure 5), attacking, blocking (Figure 6), receiving (Figure 7), and setting (Figure 8). Through frame-by-frame analysis, we can count the frequency and distribution of each action, further profiling a player's role and technical tendencies. By combining this with the landing judgment result for each rally, a complete set of match data can be established, such as the correlation between actions and points scored or lost, providing a basis for review and tactical adjustments for players and coaches.
 
-The action recognition system was tested on multiple volleyball match videos with comprehensive action detection. The results show:
+From the training log of the final model (epoch 190 of 200, early stopping with patience 50), on the \emph{validation} split:
 \begin{itemize}
-\item \textbf{Overall Detection Rate:} 94.49\% mAP@0.5 across all action classes
-\item \textbf{Real-time Performance:} 7.91 FPS processing speed (90-95ms per frame)
-\item \textbf{Action Distribution in Test Video:} Block (110), Spike (72), Set (48), Receive (25), Serve (20)
-\item \textbf{Detection Improvement:} +37.1\% more detections compared to YOLOv8 baseline
-\item \textbf{Model Comparison:} YOLOv11 shows significant accuracy improvement over YOLOv8
+\item \textbf{mAP@0.5:} 0.945; \textbf{mAP@0.5:0.95:} 0.755
+\item \textbf{Precision / recall:} 0.916 / 0.915 (F1 0.916)
+\item A YOLOv11n model reached mAP@0.5 0.937 and mAP@0.5:0.95 0.694
 \end{itemize}
+No test-split evaluation was recorded. Because the dataset consists of frames from match videos, near-duplicate frames may fall in both splits, so accuracy on unseen matches may be lower.
 
 % All figures placed before CONCLUSION - Maximum 2 images per row
 \begin{figure*}[!t]
@@ -259,11 +236,11 @@ The action recognition system was tested on multiple volleyball match videos wit
 \end{figure*}
 
 \section{CONCLUSION}
-In this study, we successfully developed a comprehensive volleyball performance analysis system that combines ball tracking and player action recognition. The system utilizes VballNet for accurate ball trajectory tracking and YOLOv11 for real-time player action detection, providing coaches and players with objective data for performance evaluation and tactical planning.
+In this study, we successfully developed a comprehensive volleyball performance analysis system that combines ball tracking and player action recognition. The system uses VballNet for ball trajectory tracking and YOLOv11 for frame-by-frame player action detection, providing coaches and players with objective data for performance evaluation and tactical planning.
 
-The ball tracking component effectively captures the volleyball's position across frames with 79.5\% accuracy using the optimized VballNet model, achieving up to 200 FPS processing speed on modest CPU hardware. The action recognition system identifies five key volleyball actions: serving, attacking, blocking, receiving, and setting with an overall mAP@0.5 of 94.49\%, representing a significant improvement over previous YOLOv8 implementations. By combining these two components, we can establish a complete dataset of match events, enabling detailed analysis of player performance and team dynamics.
+The ball tracking component captures the volleyball's position across frames with the VballNet model; its accuracy on our own footage has not yet been measured against labels. The action recognition system identifies five key volleyball actions (serving, attacking, blocking, receiving and setting) with a validation mAP@0.5 of 0.945. By combining these two components, we can establish a complete dataset of match events, enabling detailed analysis of player performance and team dynamics.
 
-This system addresses the critical need for objective performance data in volleyball training and competition, providing a scientific foundation for player development and strategic decision-making. The optimized processing capabilities (up to 200 FPS for ball tracking, 7.91 FPS for action recognition) make it suitable for live match analysis and immediate feedback during training sessions, with the action recognition system showing a 37.1\% improvement in detection quantity compared to baseline models.
+This system addresses the critical need for objective performance data in volleyball training and competition, providing a scientific foundation for player development and strategic decision-making. Processing is offline; real-time analysis during a match is future work.
 
 \subsection{Future Work}
 Future work will focus on:

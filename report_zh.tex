@@ -304,7 +304,7 @@
 \end{enumerate}
 
 \subsection{簡單結論 (Summary of Conclusions)}
-本專題成功開發了一個完整的排球比賽分析系統，整合了排球追蹤、動作識別和球員追蹤等多項功能。系統在測試影片上取得了良好的性能表現：排球追蹤準確率達到 79.5\%，動作識別 mAP@0.5 達到 94.49\%，處理速度達到 7.91 FPS。
+本專題成功開發了一個完整的排球比賽分析系統，整合了排球追蹤、動作識別和球員追蹤等多項功能。動作識別模型（YOLOv11m）在驗證集上的 mAP@0.5 為 94.49\%；排球追蹤與球員追蹤尚未以標註資料量測準確率（見第~\ref{sec:results} 節）。
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 簡介
@@ -516,7 +516,7 @@ VballNet 是基於 U-Net 架構專門設計用於排球追蹤的模型，針對�
         \hline
         訓練數據 & 148 個影片序列 \\
         \hline
-        最佳性能 & F1: 0.874, Precision: 0.882, Recall: 0.867 \\
+        公開基準 & 見上游專案 fast-volleyball-tracking-inference 的測試結果 \\
         \hline
     \end{tabular}
 \end{table}
@@ -709,12 +709,10 @@ YOLOv11 是 Ultralytics 在 2024 年發布的最新版本，在 YOLOv8 的基礎
 \textbf{性能指標：}
 
 \begin{itemize}
-    \item \textbf{mAP@0.5}：94.49\%（超越 90\% 目標）
-    \item \textbf{mAP@0.5:0.95}：64.7\%
-    \item \textbf{處理速度}：7.91 FPS（640×640 輸入）
-    \item \textbf{平均精確度}：94.46\%
-    \item \textbf{平均召回率}：91.52\%
-    \item \textbf{F1 分數}：0.930
+    \item \textbf{mAP@0.5}：94.49\%（驗證集）
+    \item \textbf{mAP@0.5:0.95}：75.5\%（驗證集）
+    \item \textbf{精確度 / 召回率}：91.6\% / 91.5\%（驗證集，F1 0.916）
+    \item 數字取自訓練紀錄（results.csv）最終模型所在的第 190 個 epoch；未留下測試集評估紀錄
 \end{itemize}
 
 \subsubsection{動作識別結果展示}
@@ -1670,259 +1668,36 @@ def test_health_check(client):
 % 實驗結果（大幅改進）
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{實驗結果 (Experimental Results)}
+\section{實驗結果 (Experimental Results)}\label{sec:results}
 
-\subsection{實驗環境配置}
+\textbf{修訂說明（2026 年 10 月）}：本章只保留有量測紀錄的數字。原版報告中查無紀錄的數字（各場景的球追蹤準確率、球員追蹤一致性、球衣辨識率、與 YOLOv8 / TrackNet / 商用系統的比較、混淆矩陣、處理時間與記憶體用量）已移除；原版保存於本專案 GitHub 的 \texttt{capstone-final} 標籤。
 
-\begin{table}[H]
-    \centering
-    \caption{實驗環境規格}
-    \begin{tabular}{|l|l|}
-        \hline
-        \textbf{項目} & \textbf{規格} \\
-        \hline
-        處理器 & Apple M1 Pro \\
-        \hline
-        記憶體 & 32GB DDR4 \\
-        \hline
-        GPU & NVIDIA RTX 5070 / Apple M1 Pro GPU (MPS) \\
-        \hline
-        作業系統 & Windows 11 / macOS Sonoma \\
-        \hline
-        Python 版本 & 3.11.5 \\
-        \hline
-        PyTorch 版本 & 2.1.0 \\
-        \hline
-        CUDA 版本 & 11.8 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsection{排球追蹤性能評估}
-
-\subsubsection{整體性能指標}
+\subsection{動作識別}
 
 \begin{table}[H]
     \centering
-    \caption{排球追蹤性能詳細指標}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{性能指標} & \textbf{數值} & \textbf{備註} \\
-        \hline
-        整體追蹤準確率 & 79.5\% & 符合目標（≥80\%） \\
-        \hline
-        偵測成功率 & 80.7\% & 成功偵測幀數比例 \\
-        \hline
-        F1 分數 & 0.874 & 精確度與召回率的調和平均 \\
-        \hline
-        精確度 (Precision) & 0.882 & 正確預測的比例 \\
-        \hline
-        召回率 (Recall) & 0.867 & 成功找到的真實目標比例 \\
-        \hline
-        處理速度 (CPU) & 最高 200 FPS & Apple M1 Pro \\
-        \hline
-        處理速度 (GPU) & 最高 350 FPS & NVIDIA RTX 5070 \\
-        \hline
-        平均延遲 & 5-10 ms & 單幀處理時間 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{不同場景下的性能}
-
-\begin{table}[H]
-    \centering
-    \caption{不同場景下的追蹤準確率}
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        \textbf{場景} & \textbf{準確率} & \textbf{誤判率} & \textbf{漏檢率} \\
-        \hline
-        室內良好光線 & 85.3\% & 8.2\% & 6.5\% \\
-        \hline
-        室內普通光線 & 79.5\% & 12.1\% & 8.4\% \\
-        \hline
-        室內低光線 & 71.2\% & 16.3\% & 12.5\% \\
-        \hline
-        室外自然光 & 82.1\% & 9.8\% & 8.1\% \\
-        \hline
-        遮擋情況 & 68.7\% & 18.9\% & 12.4\% \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsection{動作識別性能評估}
-
-\subsubsection{整體性能}
-
-\begin{table}[H]
-    \centering
-    \caption{動作識別整體性能}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{指標} & \textbf{YOLOv11m} & \textbf{YOLOv8 (對比)} \\
-        \hline
-        mAP@0.5 & \textbf{94.49\%} & 68.9\% \\
-        \hline
-        mAP@0.5:0.95 & \textbf{64.7\%} & 42.3\% \\
-        \hline
-        處理速度 (FPS) & 7.91 & 12.5 \\
-        \hline
-        每幀處理時間 & 90-95 ms & 65-70 ms \\
-        \hline
-        模型大小 & 20.1 MB & 11.2 MB \\
-        \hline
-        改進幅度 & +37.1\% & baseline \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{各動作類別性能}
-
-\begin{table}[H]
-    \centering
-    \caption{各動作類別的識別性能}
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-        \textbf{動作} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{偵測數} \\
-        \hline
-        攔網 (Block) & 96.2\% & 93.8\% & 0.950 & 110 \\
-        \hline
-        扣球 (Spike) & 95.1\% & 92.3\% & 0.937 & 72 \\
-        \hline
-        舉球 (Set) & 93.7\% & 91.5\% & 0.926 & 48 \\
-        \hline
-        接球 (Receive) & 92.8\% & 89.2\% & 0.910 & 25 \\
-        \hline
-        發球 (Serve) & 94.5\% & 90.8\% & 0.926 & 20 \\
-        \hline
-        \textbf{平均} & \textbf{94.46\%} & \textbf{91.52\%} & \textbf{0.930} & \textbf{275} \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{混淆矩陣分析}
-
-\begin{table}[H]
-    \centering
-    \caption{動作識別混淆矩陣（百分比）}
+    \caption{動作識別模型（驗證集，取自訓練紀錄）}
     \begin{tabular}{|l|c|c|c|c|c|}
         \hline
-        \textbf{實際/預測} & \textbf{Block} & \textbf{Spike} & \textbf{Set} & \textbf{Receive} & \textbf{Serve} \\
+        \textbf{模型} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{mAP@0.5} & \textbf{mAP@0.5:0.95} \\
         \hline
-        Block & \textbf{93.8} & 3.2 & 1.5 & 1.0 & 0.5 \\
+        YOLOv11m（第 190 epoch） & 0.916 & 0.915 & 0.916 & 0.945 & 0.755 \\
         \hline
-        Spike & 2.8 & \textbf{92.3} & 2.1 & 1.8 & 1.0 \\
-        \hline
-        Set & 1.2 & 3.5 & \textbf{91.5} & 2.8 & 1.0 \\
-        \hline
-        Receive & 1.5 & 4.2 & 3.5 & \textbf{89.2} & 1.6 \\
-        \hline
-        Serve & 0.8 & 2.5 & 1.2 & 4.7 & \textbf{90.8} \\
+        YOLOv11n（第 200 epoch） & -- & -- & -- & 0.937 & 0.694 \\
         \hline
     \end{tabular}
 \end{table}
 
-\subsection{球員追蹤性能評估}
+兩個模型皆以 640×640 輸入、Roboflow 合併資料集（24,806 張）訓練；YOLOv11m 設定 200 個 epoch，因 patience=50 於第 190 個 epoch 提前停止。以上為驗證集數字，未留下測試集評估紀錄。由於資料集由比賽影片逐幀擷取，相近的幀可能同時出現在訓練集與驗證集，實際在未見過的比賽上表現可能較低。
 
-\begin{table}[H]
-    \centering
-    \caption{球員追蹤性能指標}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{指標} & \textbf{數值} & \textbf{說明} \\
-        \hline
-        偵測準確率 & 91.3\% & confidence ≥ 0.5 \\
-        \hline
-        追蹤一致性 & 87.6\% & 跨幀ID一致性 \\
-        \hline
-        ID 切換率 & 4.2\% & 錯誤ID切換比例 \\
-        \hline
-        球衣號碼識別率 & 68.5\% & OCR 成功率 \\
-        \hline
-        處理速度 & 15.3 FPS & YOLOv8 + Norfair \\
-        \hline
-    \end{tabular}
-\end{table}
+\subsection{排球追蹤}
+本專題沒有以標註資料量測球追蹤的準確率。所採用 VballNet 模型的公開基準，請見上游專案 fast-volleyball-tracking-inference。後續重建工作在 5 段轉播片段（1,398 幀）上比較了模型穩定度（無標註的代理指標）：本專題使用的 FastV1 每百幀假跳點 8.37 次、偵測率 62.1\%；改用 VballNet V4c 後為每百幀 3.08 次、偵測率 68.7\%。
 
-\subsection{系統整合性能}
+\subsection{球員追蹤與落點判斷}
+球員追蹤（YOLOv8 + Norfair）與落點判斷（固定像素門檻）皆未以標註資料量測。後續重建計畫以 SportsMOT 排球序列評估球員追蹤（HOTA、IDF1），並以場地座標取代像素門檻判斷落點。
 
-\subsubsection{端到端處理性能}
-
-\begin{table}[H]
-    \centering
-    \caption{完整影片分析性能（5分鐘影片）}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{處理階段} & \textbf{處理時間} & \textbf{百分比} \\
-        \hline
-        球追蹤 & 42 秒 & 23.3\% \\
-        \hline
-        動作識別 & 78 秒 & 43.3\% \\
-        \hline
-        球員追蹤 & 52 秒 & 28.9\% \\
-        \hline
-        結果整合 & 8 秒 & 4.5\% \\
-        \hline
-        \textbf{總計} & \textbf{180 秒} & \textbf{100\%} \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{記憶體使用分析}
-
-\begin{table}[H]
-    \centering
-    \caption{系統記憶體使用情況}
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        \textbf{模組} & \textbf{峰值記憶體} & \textbf{平均記憶體} & \textbf{百分比} \\
-        \hline
-        VballNet (ONNX) & 1.2 GB & 0.8 GB & 15.4\% \\
-        \hline
-        YOLOv11m & 2.8 GB & 2.1 GB & 40.4\% \\
-        \hline
-        YOLOv8 & 1.8 GB & 1.3 GB & 25.0\% \\
-        \hline
-        Norfair 追蹤器 & 0.5 GB & 0.3 GB & 5.8\% \\
-        \hline
-        其他（緩衝區等） & 0.9 GB & 0.7 GB & 13.4\% \\
-        \hline
-        \textbf{總計} & \textbf{7.2 GB} & \textbf{5.2 GB} & \textbf{100\%} \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsection{性能比較分析}
-
-\subsubsection{與其他系統的比較}
-
-\begin{table}[H]
-    \centering
-    \caption{本系統與其他排球分析系統比較}
-    \begin{tabular}{|l|c|c|c|}
-        \hline
-        \textbf{功能/系統} & \textbf{本系統} & \textbf{TrackNet} & \textbf{商用系統} \\
-        \hline
-        球追蹤準確率 & 79.5\% & 85.2\% & 92.0\% \\
-        \hline
-        動作識別 mAP & 94.49\% & N/A & 87.3\% \\
-        \hline
-        球員追蹤 & \ding{51} & \ding{55} & \ding{51} \\
-        \hline
-        即時處理 & \ding{55} & \ding{51} & \ding{51} \\
-        \hline
-        開源可用 & \ding{51} & \ding{51} & \ding{55} \\
-        \hline
-        硬體需求 & 中等 & 低 & 高 \\
-        \hline
-        成本 & 免費 & 免費 & 高昂 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsection{功能展示}
-
-\subsubsection{用戶介面截圖}
+\subsection{結果展示}
+圖~\ref{fig:ui_main}、圖~\ref{fig:player_detection} 與圖~\ref{fig:action_stats} 為系統介面與輸出的示例畫面，用以說明功能，不代表準確率。
 
 \begin{figure}[H]
     \centering
@@ -1965,17 +1740,13 @@ def test_health_check(client):
     \label{fig:action_stats}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 討論（增強版）
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
 \section{討論 (Discussions)}
 
 \subsection{優點與缺點 (Advantages and Disadvantages)}
 
 \subsubsection{系統優點}
 \begin{enumerate}
-    \item \textbf{高準確性}：動作識別 mAP@0.5 達到 94.49\%，相較於基準模型提升 37.1\%。
+    \item \textbf{動作識別表現}：動作識別在驗證集上 mAP@0.5 為 94.49\%（未有測試集評估）。
     
     \item \textbf{功能完整}：整合球追蹤、動作識別、球員追蹤三大核心功能。
     
@@ -1990,15 +1761,11 @@ def test_health_check(client):
 
 \subsubsection{系統限制}
 \begin{enumerate}
-    \item \textbf{處理速度}：7.91 FPS 無法達到即時處理要求（需 ≥30 FPS）。
-    
-    \item \textbf{資源需求}：峰值記憶體使用達 7.2 GB，對硬體要求較高。
-    
-    \item \textbf{光線敏感}：在低光線環境下，球追蹤準確率下降至 71.2\%。
+    \item \textbf{處理速度}：動作識別無法達到即時處理。
     
     \item \textbf{遮擋問題}：當球員相互遮擋時，追蹤一致性降低。
     
-    \item \textbf{球衣識別}：OCR 識別率僅 68.5\%，需要手動修正。
+    \item \textbf{球衣識別}：OCR 辨識結果未經量測，常需要手動修正。
     
     \item \textbf{資料清理}：目前使用 SQLite 持久化存儲，但缺乏自動備份機制。
     
@@ -2014,17 +1781,17 @@ def test_health_check(client):
         \hline
         \textbf{問題} & \textbf{解決方案} & \textbf{預期效果} \\
         \hline
-        處理速度慢 & 模型量化、使用 TensorRT 優化 & 提升至 15-20 FPS \\
+        處理速度慢 & 模型量化、使用 TensorRT 優化 & 提升處理速度 \\
         \hline
-        記憶體佔用高 & 模型蒸餾、批次處理優化 & 降低至 4-5 GB \\
+        記憶體佔用高 & 模型蒸餾、批次處理優化 & 降低記憶體用量 \\
         \hline
-        低光線性能差 & 圖像增強預處理、使用更大訓練集 & 提升至 78-80\% \\
+        球在畫面中過小 & 提高輸入解析度、分塊偵測 & 提升廣角畫面的偵測率 \\
         \hline
-        球衣識別率低 & 整合多幀投票機制、優化 OCR 模型 & 提升至 85\% \\
+        球衣識別需手動修正 & 整合多幀投票機制、優化 OCR 模型 & 減少手動修正 \\
         \hline
         無資料庫支援 & 整合 PostgreSQL 或 MongoDB & 持久化存儲 \\
         \hline
-        場地偵測未實作 & 使用語義分割模型（DeepLabV3+ 或 U-Net）偵測場地邊界 & 實現 in/out 判斷 \\
+        場地偵測未實作 & 以場地關鍵點模型求得單應性，換算場地公尺座標（重建工作已進行） & 實現 in/out 判斷 \\
         \hline
     \end{tabular}
 \end{table}
@@ -2064,8 +1831,8 @@ def test_health_check(client):
     \item \textbf{問題解決能力}：
     \begin{itemize}
         \item 解決模型整合問題（不同格式：ONNX、PyTorch）
-        \item 優化記憶體使用（峰值從 12GB 降至 7.2GB）
-        \item 改進動作合併演算法（減少 45\% 的碎片化事件）
+        \item 優化記憶體使用
+        \item 改進動作合併演算法，將連續偵測合併為事件
     \end{itemize}
     
     \item \textbf{文獻研讀}：閱讀 15+ 篇相關論文，理解最新技術。
@@ -2111,9 +1878,8 @@ def test_health_check(client):
 \begin{enumerate}
     \item \textbf{技術目標達成}：
     \begin{itemize}
-        \item 球追蹤準確率：79.5\%（接近 80\% 目標）
-        \item 動作識別 mAP@0.5：94.49\%（超越 90\% 目標）
-        \item 球員追蹤一致性：87.6\%
+        \item 動作識別 mAP@0.5：94.49\%（驗證集）
+        \item 球追蹤、球員追蹤與落點判斷：已完成功能，尚未以標註資料量測準確率
     \end{itemize}
     
     \item \textbf{系統整合完成}：
@@ -2125,9 +1891,9 @@ def test_health_check(client):
     
     \item \textbf{創新貢獻}：
     \begin{itemize}
-        \item 動作合併演算法：減少 45\% 碎片化事件
-        \item 智能信心度過濾：降低 30\% 誤判率
-        \item 多幀球衣號碼融合：提升 OCR 準確度至 68.5\%
+        \item 動作合併演算法：將連續偵測合併為單一事件
+        \item 信心度過濾：以門檻過濾低信心的偵測
+        \item 多幀球衣號碼融合：整合多幀的辨識結果
     \end{itemize}
 \end{enumerate}
 
