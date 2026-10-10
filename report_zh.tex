@@ -288,7 +288,7 @@
 \begin{itemize}
     \item \textbf{排球追蹤}：使用 VballNet 模型基於 U-Net 架構，能夠準確追蹤排球在影片中的位置，並通過時間序列分析判斷球的落點位置。
     \item \textbf{球員動作識別}：使用 YOLOv11m 模型識別五種關鍵排球動作，包括發球（serve）、扣球（spike）、攔網（block）、接球（receive）和舉球（set）。
-    \item \textbf{球員偵測與追蹤}：使用 YOLOv8 進行球員偵測，並結合 Norfair 追蹤器實現跨幀的球員追蹤，支持球衣號碼識別功能。
+    \item \textbf{球員偵測與追蹤}：使用 YOLOv8 進行球員偵測，並結合 Norfair 追蹤器實現跨幀的球員追蹤，支持球衣號碼識別功能\footnote{事後發現球衣號碼模型的訓練標籤有誤，該模型不應使用，見第~\ref{sec:errata} 節。}。
     \item \textbf{網頁應用系統}：提供完整的 React 前端和 FastAPI 後端，支持影片上傳、分析處理、互動式播放和數據可視化等功能。
 \end{itemize}
 
@@ -1685,10 +1685,12 @@ def test_health_check(client):
         \hline
         YOLOv11n（第 200 epoch） & -- & -- & -- & 0.937 & 0.694 \\
         \hline
+        YOLOv11m，測試集（2026 年 10 月補測） & 0.952 & 0.937 & 0.944 & 0.957 & 0.790 \\
+        \hline
     \end{tabular}
 \end{table}
 
-兩個模型皆以 640×640 輸入、Roboflow 合併資料集（24,806 張）訓練；YOLOv11m 設定 200 個 epoch，因 patience=50 於第 190 個 epoch 提前停止。以上為驗證集數字，未留下測試集評估紀錄。由於資料集由比賽影片逐幀擷取，相近的幀可能同時出現在訓練集與驗證集，實際在未見過的比賽上表現可能較低。
+兩個模型皆以 640×640 輸入、Roboflow 合併資料集（24,806 張）訓練；YOLOv11m 設定 200 個 epoch，因 patience=50 於第 190 個 epoch 提前停止。前兩列為驗證集數字。專題當時未留下測試集評估紀錄，最後一列為 2026 年 10 月補測的測試集結果（見第~\ref{sec:errata} 節）。由於資料集由比賽影片逐幀擷取，相近的幀可能同時出現在訓練、驗證與測試集，實際在未見過的比賽上表現可能較低。
 
 \subsection{排球追蹤}
 本專題沒有以標註資料量測球追蹤的準確率。所採用 VballNet 模型的公開基準，請見上游專案 fast-volleyball-tracking-inference。後續重建工作在 5 段轉播片段（1,398 幀）上比較了模型穩定度（無標註的代理指標）：本專題使用的 FastV1 每百幀假跳點 8.37 次、偵測率 62.1\%；改用 VballNet V4c 後為每百幀 3.08 次、偵測率 68.7\%。
@@ -1746,7 +1748,7 @@ def test_health_check(client):
 
 \subsubsection{系統優點}
 \begin{enumerate}
-    \item \textbf{動作識別表現}：動作識別在驗證集上 mAP@0.5 為 94.49\%（未有測試集評估）。
+    \item \textbf{動作識別表現}：動作識別在驗證集上 mAP@0.5 為 94.49\%；2026 年 10 月補測的測試集為 95.7\%，但測試集與訓練集來自同一批比賽（見第~\ref{sec:errata} 節）。
     
     \item \textbf{功能完整}：整合球追蹤、動作識別、球員追蹤三大核心功能。
     
@@ -2043,6 +2045,54 @@ def test_health_check(client):
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 附錄：原始程式碼（簡化版）
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{勘誤與後續發展 (Errata and Later Work)}\label{sec:errata}
+
+本節於 2026 年 10 月加入。上文保留專題評分時的內容（評分版本保存於 \texttt{capstone-final} 標籤），僅修正有誤之處；以下列出事後發現的問題與專題結束後的後續發展。
+
+\subsection{勘誤}
+
+\paragraph{動作識別：補測測試集。}專題當時只留下驗證集數字。2026 年 10 月以同一份資料切分的測試集（2,554 張，訓練與模型選擇皆未使用）重新量測 YOLOv11m：
+
+\begin{table}[H]
+    \centering
+    \caption{動作識別模型於測試集的表現（2026 年 10 月補測）}
+    \begin{tabular}{|l|c|c|c|c|c|c|}
+        \hline
+        & \textbf{全部} & \textbf{攔網} & \textbf{接球} & \textbf{發球} & \textbf{舉球} & \textbf{扣球} \\
+        \hline
+        AP@0.5 & 0.957 & 0.987 & 0.863 & 0.967 & 0.976 & 0.991 \\
+        \hline
+        AP@0.5:0.95 & 0.790 & 0.797 & 0.679 & 0.751 & 0.845 & 0.879 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+整體 Precision 0.952、Recall 0.937。須注意：測試集中可辨識來源影片的 1,222 張，全部來自訓練集也出現過的影片，因此這是「同一批比賽」上的成績，不代表在未見過的比賽上的表現。資料分布也不平均：訓練集中接球僅 984 個框，約為扣球（4,791 個）的五分之一，也是表現最差的類別；資料集沒有防守（dig）類別。
+
+\paragraph{球衣號碼模型：訓練標籤有誤。}合併四個 Roboflow 資料集的程式（\texttt{organize\_datasets.py}）只依類別「編號」對應，未比對類別「名稱」。其中兩個資料集的類別不是數字：一個的「球」「球員」「號碼」被當成數字 0、1、2，另一個的「整個號碼」被當成數字 0。以後者的 87 張測試圖驗證，模型對 86 個「整個號碼」框輸出「0」。因此訓練紀錄中的驗證集 mAP@0.5 0.966 並不代表模型能辨識數字，本報告所述之球衣號碼識別所用模型不應使用；修正合併程式並重新訓練已列入後續計畫。
+
+\subsection{後續發展}
+
+專題結束後，系統以「每個數字都要有量測來源」為原則重建，程式碼整合於 \url{https://github.com/DL-Volleyball-Analysis/volleyball-analysis}。主要進展如下（量測方式與腳本見該儲存庫的 \texttt{docs/results}）：
+
+\begin{itemize}
+    \item \textbf{自動場地定位}：以 14 個關鍵點的姿態模型取代手動點選四角，逐鏡頭求得影像與場地的對應；在未參與訓練的標註影像上，場地位置誤差中位數 0.49 公尺，並以「地面與網子關鍵點是否一致」自動標出可疑的場地。
+    \item \textbf{球員追蹤}：YOLO26s + BoT-SORT，並以場地座標過濾場外人員；在 SportsMOT 排球序列上 IDF1 0.484、HOTA 0.467。
+    \item \textbf{球追蹤}：改用 VballNet V4c，假跳點約為專題所用模型的三分之一（無標註的代理指標）。
+    \item \textbf{三維球軌跡}：由場地與網子關鍵點校正攝影機，對每段飛行擬合拋物線；合成資料上發球位置誤差中位數 0.05 公尺，物理上不可能的擬合會被剔除。
+    \item \textbf{新的檢視介面}：可快取的分段分析流程、時間軸、2D/3D 戰術板與教練標記的球員統計。
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{image/later-analysis.jpg}
+    \caption{重建後系統的自動分析輸出：球的軌跡、球員追蹤（標示為追蹤編號）、場地線與右下角的俯視場地圖}
+    \label{fig:later_analysis}
+\end{figure}
+
+專題時期的各個儲存庫已整理並封存，更名為 \texttt{capstone-webapp}、\texttt{capstone-action-recognition}、\texttt{capstone-jersey-numbers}、\texttt{capstone-court-detection} 與 \texttt{capstone-prototype}。
+
 \newpage
 \section*{附錄：原始程式碼 (Appendices: Source Codes)}
 \addcontentsline{toc}{section}{附錄：原始程式碼}
@@ -2519,8 +2569,8 @@ analysis_results = {
 
 \begin{itemize}
     \item \textbf{專案網站}：\url{https://github.com/DL-Volleyball-Analysis}
-    \item \textbf{GitHub 儲存庫}：\url{https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp}
-    \item \textbf{展示影片}：\url{https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp}
+    \item \textbf{GitHub 儲存庫}：\url{https://github.com/DL-Volleyball-Analysis/capstone-webapp}（專題版本，已封存）；後續版本：\url{https://github.com/DL-Volleyball-Analysis/volleyball-analysis}
+    \item \textbf{展示影片}：\url{https://github.com/DL-Volleyball-Analysis/capstone-webapp}
     \item \textbf{技術文檔}：\url{https://github.com/DL-Volleyball-Analysis/capstone-report}
 \end{itemize}
 
@@ -2586,8 +2636,8 @@ analysis_results = {
     \item \textbf{梁祐嘉}：ch993115@gmail.com
     \item \textbf{蔡佩穎}：tinatina62027@gmail.com
     \item \textbf{鍾佳芯}：aa0925129765@gmail.com
-    \item \textbf{GitHub Issues}：\url{https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp/issues}
-    \item \textbf{討論區}：\url{https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp/discussions}
+    \item \textbf{GitHub Issues}：\url{https://github.com/DL-Volleyball-Analysis/volleyball-analysis/issues}
+    \item \textbf{討論區}：\url{https://github.com/DL-Volleyball-Analysis/volleyball-analysis/discussions}
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

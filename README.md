@@ -72,9 +72,10 @@ Ongoing work: [volleyball-analysis](https://github.com/DL-Volleyball-Analysis/vo
 | Project | Description |
 |---------|-------------|
 | [volleyvision-website](https://github.com/DL-Volleyball-Analysis/volleyvision-website) | Landing page website |
-| [volleyball_analysis_webapp](https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp) | Main web application |
-| [volleyball-court-detection](https://github.com/DL-Volleyball-Analysis/volleyball-court-detection) | Court detection and ball landing |
-| [action-recognition-yolov11](https://github.com/DL-Volleyball-Analysis/action-recognition-yolov11) | Action recognition training |
+| [volleyball-analysis](https://github.com/DL-Volleyball-Analysis/volleyball-analysis) | current system (code, results, web app) |
+| [capstone-webapp](https://github.com/DL-Volleyball-Analysis/capstone-webapp) | capstone web application (archived) |
+| [capstone-court-detection](https://github.com/DL-Volleyball-Analysis/capstone-court-detection) | capstone court and ball landing (archived) |
+| [capstone-action-recognition](https://github.com/DL-Volleyball-Analysis/capstone-action-recognition) | capstone action recognition training (archived) |
 
 ---
 

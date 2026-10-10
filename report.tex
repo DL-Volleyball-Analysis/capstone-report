@@ -170,7 +170,7 @@ From the training log of the final model (epoch 190 of 200, early stopping with 
 \item \textbf{Precision / recall:} 0.916 / 0.915 (F1 0.916)
 \item A YOLOv11n model reached mAP@0.5 0.937 and mAP@0.5:0.95 0.694
 \end{itemize}
-No test-split evaluation was recorded. Because the dataset consists of frames from match videos, near-duplicate frames may fall in both splits, so accuracy on unseen matches may be lower.
+No test-split evaluation was recorded at the time; a later test-split measurement is given in Errata and Later Work. Because the dataset consists of frames from match videos, near-duplicate frames may fall in both splits, so accuracy on unseen matches may be lower.
 
 % All figures placed before CONCLUSION - Maximum 2 images per row
 \begin{figure*}[!t]
@@ -235,6 +235,15 @@ No test-split evaluation was recorded. Because the dataset consists of frames fr
     \end{minipage}
 \end{figure*}
 
+\section{ERRATA AND LATER WORK}
+This section was added in October 2026; the graded text above is kept (graded version under the \texttt{capstone-final} tag) apart from corrections.
+
+\textbf{Action recognition, test split.} Measured on the dataset's 2,554-image test split, unused in training and model selection: mAP@0.5 0.957, mAP@0.5:0.95 0.790, precision 0.952, recall 0.937; per class AP@0.5 block 0.987, receive 0.863, serve 0.967, set 0.976, spike 0.991. All 1,222 test images with a source-video name come from videos also in the training split, so these are not unseen-match scores. Receive has about a fifth of spike's training boxes (984 vs.\ 4,791) and is the weakest class; there is no dig class.
+
+\textbf{Jersey numbers.} The script that merged four Roboflow datasets mapped class indices and ignored class names, so balls, whole players and whole-number boxes became the digits 0, 1 and 2; on 87 test crops of one dataset the model outputs ``0'' on 86 whole-number boxes. Its validation mAP@0.5 of 0.966 does not measure digit reading, and the model should not be used; a corrected merge and retraining are planned.
+
+\textbf{Later work.} After the capstone the system was rebuilt around measured results (\url{https://github.com/DL-Volleyball-Analysis/volleyball-analysis}): a 14-keypoint court model replaces the four manual clicks (0.49 m median court-position error on held-out images, with a floor--net consistency check that flags doubtful courts); YOLO26s + BoT-SORT player tracking with on-court filtering (IDF1 0.484, HOTA 0.467 on SportsMOT volleyball); VballNet V4c ball tracking (about a third of the false jumps, label-free proxy); single-camera 3D ball flights from a court-calibrated camera (0.05 m median error on a synthetic serve); and a new review app with a timeline, 2D/3D tactics board and coach-tag statistics.
+
 \section{CONCLUSION}
 In this study, we successfully developed a comprehensive volleyball performance analysis system that combines ball tracking and player action recognition. The system uses VballNet for ball trajectory tracking and YOLOv11 for frame-by-frame player action detection, providing coaches and players with objective data for performance evaluation and tactical planning.
 
@@ -256,8 +265,9 @@ Future work will focus on:
 The complete source code, trained models, and documentation are available at:
 \begin{itemize}
 \item \textbf{Organization:} \url{https://github.com/DL-Volleyball-Analysis}
-\item \textbf{Web Application:} \url{https://github.com/DL-Volleyball-Analysis/volleyball_analysis_webapp}
-\item \textbf{Action Recognition:} \url{https://github.com/DL-Volleyball-Analysis/action-recognition-yolov11}
+\item \textbf{Web Application (capstone, archived):} \url{https://github.com/DL-Volleyball-Analysis/capstone-webapp}
+\item \textbf{Current system:} \url{https://github.com/DL-Volleyball-Analysis/volleyball-analysis}
+\item \textbf{Action Recognition (archived):} \url{https://github.com/DL-Volleyball-Analysis/capstone-action-recognition}
 \item \textbf{Technical Report:} \url{https://github.com/DL-Volleyball-Analysis/capstone-report}
 \end{itemize}
 
